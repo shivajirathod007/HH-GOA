@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Camera, Image as ImageIcon, IdCard, Zap } from "lucide-react";
 import type { FormatType } from "@/types";
 
 export default function LandingPage() {
@@ -43,51 +44,23 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative flex-1 flex flex-col items-center justify-center px-4 py-16 sm:py-24 z-10">
         
-        {/* Logos Area */}
-        <div className="flex flex-col items-center gap-6 mb-12 animate-fade-in-up">
-          <div className="relative group">
-            {/* Logo glow */}
-            <div className="absolute inset-0 bg-brand-yellow/20 blur-3xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            <Image 
-              src="/assets/hacker-house-logo.png" 
-              alt="Hacker House" 
-              width={400} 
-              height={82}
-              className="relative drop-shadow-2xl brightness-110 object-contain w-64 md:w-80 lg:w-[400px]"
-              priority
-            />
-          </div>
-          
-          <div className="relative">
-            <div className="absolute inset-0 bg-brand-magenta/30 blur-2xl rounded-full scale-125" />
-            <Image 
-              src="/assets/goa-logo.png" 
-              alt="Goa" 
-              width={160} 
-              height={160}
-              className="relative drop-shadow-xl animate-float object-contain w-28 md:w-36 lg:w-40"
-              priority
-            />
-          </div>
-        </div>
-
         {/* Content */}
-        <div className="relative max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+        <div className="relative max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">
           
           {/* Main headline */}
           <h1
-            className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight tracking-tight drop-shadow-lg"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight drop-shadow-2xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            <span className="text-white">Your Face. </span>
-            <span className="gradient-text">Your Build. </span>
-            <span className="text-brand-yellow">Your Goa.</span>
+            <span className="gradient-text-white">Your Face. </span>
+            <span className="gradient-text-magenta">Your Build. </span>
+            <span className="gradient-text-yellow">Your Goa.</span>
           </h1>
 
           {/* Tagline */}
           <p className="text-lg sm:text-xl text-gray-400 font-medium max-w-2xl mx-auto">
-            Generate your official <span className="text-white">Hacker House Goa 2026</span> social graphic instantly.
-            No signup. No data stored. Just pure vibes.
+            Generate your official <span className="text-white font-semibold">Hacker House Goa 2026</span> social graphic
+            instantly. No signup. No data stored. Just pure vibes.
           </p>
 
           {/* Format Selection Cards */}
@@ -105,8 +78,8 @@ export default function LandingPage() {
                 {/* Preview mockup */}
                 <div className="w-full aspect-square rounded-2xl mb-6 bg-black/40 flex items-center justify-center relative shadow-inner">
                   <div className="w-[75%] h-[75%] relative rounded-xl overflow-hidden border-2 border-brand-magenta/80 shadow-2xl shadow-brand-magenta/20">
-                    <div className="absolute inset-0 flex items-center justify-center text-4xl opacity-50 bg-[#1a1a2e]">
-                      📸
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a2e]">
+                      <Camera className="w-8 h-8 text-gray-400 opacity-60" strokeWidth={1.5} />
                     </div>
                     {/* Bottom bar */}
                     <div className="absolute bottom-0 w-full h-8 bg-[#0D0515] flex items-center justify-between px-3 border-t border-brand-magenta/30">
@@ -120,7 +93,7 @@ export default function LandingPage() {
 
                 <div className="flex flex-col gap-2 relative z-10">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">🖼️</span>
+                    <ImageIcon className="w-6 h-6 text-brand-magenta" strokeWidth={2} />
                     <h2 className="text-2xl font-bold text-white tracking-wide">PFP Frame</h2>
                   </div>
                   <p className="text-sm text-gray-400 mb-6 leading-relaxed">
@@ -152,13 +125,15 @@ export default function LandingPage() {
                       <p className="text-[7px] text-brand-magenta font-semibold tracking-widest mt-1">GOA 2026</p>
                       <div className="w-full h-px bg-brand-yellow/30 mt-2" />
                     </div>
-                    <div className="w-16 h-16 rounded-xl bg-[#1a1a2e] border-2 border-brand-magenta flex items-center justify-center text-2xl shadow-lg mt-2">
-                      📸
+                    <div className="w-16 h-16 rounded-xl bg-[#1a1a2e] border-2 border-brand-magenta flex items-center justify-center shadow-lg mt-2">
+                      <Camera className="w-6 h-6 text-gray-400 opacity-80" strokeWidth={1.5} />
                     </div>
                     <div className="text-center w-full mt-3">
                       <p className="text-[10px] font-bold text-white mb-0.5">Your Name</p>
                       <p className="text-[7px] text-gray-400 font-mono mb-1.5">Full Stack Dev</p>
-                      <p className="text-[8px] font-bold text-brand-yellow">⚡ Code Wizard</p>
+                      <p className="text-[8px] font-bold text-brand-yellow flex items-center justify-center gap-1">
+                        <Zap className="w-2.5 h-2.5 fill-brand-yellow" /> Code Wizard
+                      </p>
                     </div>
                     <div className="w-full mt-2">
                       <div className="w-full h-px bg-brand-yellow/30 mb-1" />
@@ -169,7 +144,7 @@ export default function LandingPage() {
 
                 <div className="flex flex-col gap-2 relative z-10">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">🪪</span>
+                    <IdCard className="w-6 h-6 text-brand-yellow" strokeWidth={2} />
                     <h2 className="text-2xl font-bold text-white tracking-wide">Builder Card</h2>
                   </div>
                   <p className="text-sm text-gray-400 mb-6 leading-relaxed">

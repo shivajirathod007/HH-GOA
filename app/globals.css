@@ -151,13 +151,30 @@ body {
   border-radius: 16px;
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(
-    135deg,
-    var(--color-brand-magenta),
-    var(--color-brand-yellow)
-  );
+/* Dynamic text gradients */
+.gradient-text-white {
+  background: linear-gradient(180deg, #FFFFFF 0%, #B8B0C4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-magenta {
+  background: linear-gradient(135deg, #F74DA8 0%, #E91E8C 40%, #FF6B6B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-yellow {
+  background: linear-gradient(135deg, #FFEA7A 0%, #FFD700 40%, #FF8A00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-sunset {
+  background: linear-gradient(135deg, var(--color-brand-magenta) 0%, var(--color-brand-yellow) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
