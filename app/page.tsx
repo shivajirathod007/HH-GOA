@@ -45,17 +45,29 @@ export default function LandingPage() {
       <section className="relative flex-1 flex flex-col items-center justify-center px-4 py-16 sm:py-24 z-10">
         
         {/* Content */}
-        <div className="relative max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">
+        <div className="relative max-w-5xl mx-auto text-center space-y-10 animate-fade-in-up">
           
+          {/* Main Logo */}
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/assets/hh-goa-logo-transparent.png"
+              alt="Hacker House Goa 2026"
+              width={800}
+              height={240}
+              className="w-full max-w-[800px] h-auto object-contain drop-shadow-2xl animate-float"
+              priority
+            />
+          </div>
+
           {/* Event badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-magenta/10 border border-brand-magenta/30 text-brand-magenta text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(233,30,140,0.15)]">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-magenta/10 border border-brand-magenta/30 text-brand-magenta text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(233,30,140,0.15)]">
             <span className="w-2 h-2 rounded-full bg-brand-magenta animate-pulse" />
-            Hacker House Goa · 28–31 Oct 2026
+            28–31 Oct 2026
           </div>
 
           {/* Main headline */}
           <h1
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight drop-shadow-2xl"
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tight drop-shadow-2xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
             <span className="gradient-text-white">Your Face. </span>
@@ -64,22 +76,22 @@ export default function LandingPage() {
           </h1>
 
           {/* Tagline */}
-          <p className="text-lg sm:text-xl text-gray-400 font-medium max-w-2xl mx-auto">
+          <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 font-medium max-w-4xl mx-auto leading-relaxed">
             Generate your official <span className="text-white font-semibold">Hacker House Goa 2026</span> social graphic
             instantly. No signup. No data stored. Just pure vibes.
           </p>
 
           {/* Stats row */}
-          <div className="flex items-center justify-center gap-8 text-sm text-gray-500 font-medium pt-2">
-            <span className="flex items-center gap-1.5"><span className="text-brand-yellow font-black">300+</span> Hackers</span>
-            <span className="w-1 h-1 rounded-full bg-gray-700"/>
-            <span className="flex items-center gap-1.5"><span className="text-brand-magenta font-black">4</span> Days</span>
-            <span className="w-1 h-1 rounded-full bg-gray-700"/>
-            <span className="flex items-center gap-1.5"><span className="text-white font-black">∞</span> Vibes</span>
+          <div className="flex items-center justify-center gap-6 sm:gap-12 text-base sm:text-lg text-gray-400 font-medium pt-4">
+            <span className="flex items-center gap-2"><span className="text-brand-yellow font-black text-xl">300+</span> Hackers</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-600"/>
+            <span className="flex items-center gap-2"><span className="text-brand-magenta font-black text-xl">4</span> Days</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-600"/>
+            <span className="flex items-center gap-2"><span className="text-white font-black text-xl">∞</span> Vibes</span>
           </div>
 
           {/* Format Selection Cards */}
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto pt-8">
+          <div className="grid sm:grid-cols-2 gap-8 sm:gap-12 max-w-5xl mx-auto pt-8">
             {/* Format A — PFP Frame */}
             <button
               onClick={() => handleChooseFormat("A")}
@@ -90,12 +102,12 @@ export default function LandingPage() {
             >
               {/* Glow bloom */}
               <div className="absolute -inset-1 bg-brand-magenta/30 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-[36px]" />
-              <div className="relative bg-gradient-to-b from-[#1c0d30] to-[#0f0620] border border-brand-magenta/25 group-hover:border-brand-magenta/70 rounded-[28px] overflow-hidden transition-all duration-500 shadow-2xl shadow-black/60">
+              <div className="relative bg-gradient-to-b from-[#1c0d30] to-[#0f0620] border border-brand-magenta/25 group-hover:border-brand-magenta/70 rounded-[32px] overflow-hidden transition-all duration-500 shadow-2xl shadow-black/60">
                 {/* Card shimmer top bar */}
-                <div className="h-1 w-full bg-gradient-to-r from-brand-magenta via-brand-yellow to-brand-magenta" />
+                <div className="h-1.5 w-full bg-gradient-to-r from-brand-magenta via-brand-yellow to-brand-magenta" />
 
                 {/* Preview mockup */}
-                <div className="p-5 pb-0">
+                <div className="p-6 pb-0">
                   <div className="w-full aspect-square rounded-2xl bg-[#080212] flex items-center justify-center relative overflow-hidden shadow-inner border border-white/5">
                     {/* Background ambient */}
                     <div className="absolute top-0 left-0 w-40 h-40 rounded-full bg-brand-magenta/20 blur-3xl" />
@@ -135,17 +147,17 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 p-6 pt-5">
+                <div className="flex flex-col gap-3 p-8 pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-brand-magenta/15 border border-brand-magenta/30 flex items-center justify-center">
-                      <ImageIcon className="w-5 h-5 text-brand-magenta" strokeWidth={2} />
+                    <div className="w-10 h-10 rounded-xl bg-brand-magenta/15 border border-brand-magenta/30 flex items-center justify-center">
+                      <ImageIcon className="w-5 h-5 text-brand-magenta" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-2xl font-black text-white tracking-wide">PFP Frame</h2>
+                    <h2 className="text-3xl font-black text-white tracking-wide">PFP Frame</h2>
                   </div>
-                  <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                  <p className="text-base sm:text-lg text-gray-300 font-medium leading-relaxed mb-4">
                     Square overlay for X/Twitter. Wrap your photo in HH Goa 2026 branding instantly.
                   </p>
-                  <div className="inline-flex items-center justify-center bg-gradient-to-r from-brand-magenta to-[#c4177a] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(233,30,140,0.25)] group-hover:shadow-[0_0_35px_rgba(233,30,140,0.55)] group-hover:scale-[1.02] duration-300">
+                  <div className="inline-flex items-center justify-center bg-gradient-to-r from-brand-magenta to-[#c4177a] text-white font-bold text-lg py-4 px-8 rounded-2xl transition-all shadow-[0_0_20px_rgba(233,30,140,0.25)] group-hover:shadow-[0_0_35px_rgba(233,30,140,0.55)] group-hover:scale-[1.02] duration-300">
                     Create Frame <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
                   </div>
                 </div>
@@ -162,12 +174,12 @@ export default function LandingPage() {
             >
               {/* Glow bloom */}
               <div className="absolute -inset-1 bg-brand-yellow/20 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-[36px]" />
-              <div className="relative bg-gradient-to-b from-[#1c1405] to-[#0f0c02] border border-brand-yellow/20 group-hover:border-brand-yellow/60 rounded-[28px] overflow-hidden transition-all duration-500 shadow-2xl shadow-black/60">
+              <div className="relative bg-gradient-to-b from-[#1c1405] to-[#0f0c02] border border-brand-yellow/20 group-hover:border-brand-yellow/60 rounded-[32px] overflow-hidden transition-all duration-500 shadow-2xl shadow-black/60">
                 {/* Card shimmer top bar */}
-                <div className="h-1 w-full bg-gradient-to-r from-brand-yellow via-brand-magenta to-brand-yellow" />
+                <div className="h-1.5 w-full bg-gradient-to-r from-brand-yellow via-brand-magenta to-brand-yellow" />
 
                 {/* Preview mockup */}
-                <div className="p-5 pb-0">
+                <div className="p-6 pb-0">
                   <div className="w-full aspect-square rounded-2xl bg-[#080805] flex items-center justify-center relative overflow-hidden shadow-inner border border-white/5">
                     {/* Background ambient */}
                     <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-brand-yellow/15 blur-3xl" />
@@ -222,17 +234,17 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 p-6 pt-5">
+                <div className="flex flex-col gap-3 p-8 pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-brand-yellow/15 border border-brand-yellow/30 flex items-center justify-center">
-                      <IdCard className="w-5 h-5 text-brand-yellow" strokeWidth={2} />
+                    <div className="w-10 h-10 rounded-xl bg-brand-yellow/15 border border-brand-yellow/30 flex items-center justify-center">
+                      <IdCard className="w-5 h-5 text-brand-yellow" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-2xl font-black text-white tracking-wide">Builder Card</h2>
+                    <h2 className="text-3xl font-black text-white tracking-wide">Builder Card</h2>
                   </div>
-                  <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                  <p className="text-base sm:text-lg text-gray-300 font-medium leading-relaxed mb-4">
                     Portrait ID card with your photo, stack & an AI-generated hacker title.
                   </p>
-                  <div className="inline-flex items-center justify-center bg-gradient-to-r from-brand-yellow to-[#e6c200] text-black font-black py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(255,215,0,0.15)] group-hover:shadow-[0_0_35px_rgba(255,215,0,0.45)] group-hover:scale-[1.02] duration-300">
+                  <div className="inline-flex items-center justify-center bg-gradient-to-r from-brand-yellow to-[#e6c200] text-black font-black text-lg py-4 px-8 rounded-2xl transition-all shadow-[0_0_20px_rgba(255,215,0,0.15)] group-hover:shadow-[0_0_35px_rgba(255,215,0,0.45)] group-hover:scale-[1.02] duration-300">
                     Create Card <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
                   </div>
                 </div>

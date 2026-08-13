@@ -178,10 +178,7 @@ function ImagePositioner({
         <div
           ref={containerRef}
           className="relative w-full overflow-hidden rounded-xl cursor-grab active:cursor-grabbing mx-auto bg-[#1a1a2e] shadow-2xl shadow-black/50"
-          style={{
-            aspectRatio: `${aspectRatio}`,
-            maxWidth: aspectRatio >= 1 ? "400px" : `${400 * aspectRatio}px`,
-          }}
+          style={{ aspectRatio: `${aspectRatio}` }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -531,11 +528,9 @@ function EditorContent() {
         </div>
       </nav>
 
-      {/* Main content */}
-      <div className="flex-1 px-4 py-8 sm:py-12 max-w-lg mx-auto w-full relative z-10 animate-fade-in-up">
-        
-        {/* Step 1: Upload */}
-        {!previewUrl && (
+      {/* ── Step 1: Upload — always narrow centered ── */}
+      {!previewUrl && !generatedImage && (
+        <div className="flex-1 px-4 py-8 sm:py-12 max-w-lg mx-auto w-full relative z-10 animate-fade-in-up">
           <div className="space-y-6">
             <div className="text-center space-y-2 mb-8">
               <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
@@ -547,155 +542,249 @@ function EditorContent() {
             </div>
             <ImageUploader onImageSelected={handleImageSelected} />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Step 2: Adjust + (Form for B) */}
-        {previewUrl && !generatedImage && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between px-2">
-              <h2 className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
-                Position Photo
-              </h2>
-              <button
-                onClick={handleStartOver}
-                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition-colors border border-white/5"
-              >
-                <RotateCcw className="w-3.5 h-3.5" /> Change
-              </button>
-            </div>
-
-            <ImagePositioner
-              previewUrl={previewUrl}
-              aspectRatio={aspectRatio}
-              crop={crop}
-              onCropChange={setCrop}
-            />
-
-            {format === "B" && (
-              <BuilderForm
-                name={name}
-                stack={stack}
-                builderTitle={builderTitle}
-                onNameChange={setName}
-                onStackChange={setStack}
-                onRegenerateTitle={handleRegenerateTitle}
-              />
-            )}
-
-            {error && (
-              <div className="p-4 rounded-xl text-sm font-medium bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                {error}
-              </div>
-            )}
-
+      {/* ── Step 2: Adjust + Form — two-col on desktop ── */}
+      {previewUrl && !generatedImage && (
+        <div className="flex-1 relative z-10 animate-fade-in-up w-full">
+          {/* Header row */}
+          <div className="flex items-center justify-between px-4 sm:px-8 pt-8 pb-4 max-w-5xl mx-auto">
+            <h2 className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+              Position Photo
+            </h2>
             <button
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className={`w-full flex items-center justify-center gap-2 font-bold text-lg py-4 rounded-2xl transition-all shadow-lg ${
-                format === "A" 
-                  ? "bg-brand-magenta hover:bg-[#d8157a] text-white shadow-[0_0_20px_rgba(233,30,140,0.3)] hover:shadow-[0_0_30px_rgba(233,30,140,0.5)]" 
-                  : "bg-brand-yellow hover:bg-[#e6c200] text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              onClick={handleStartOver}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition-colors border border-white/5"
             >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" /> 
-                  Generate {format === "A" ? "Frame" : "Card"}
-                </>
-              )}
+              <RotateCcw className="w-3.5 h-3.5" /> Change
             </button>
           </div>
-        )}
 
-        {/* Step 3: Result */}
-        {generatedImage && (
-          <div className="space-y-6 animate-fade-in-up">
-            {/* Header */}
-            <div className="text-center space-y-2">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-brand-magenta/30 to-brand-yellow/20 text-brand-yellow mb-2 border border-brand-yellow/30 shadow-[0_0_24px_rgba(255,215,0,0.2)]">
-                <PartyPopper className="w-7 h-7" />
-              </div>
-              <h2 className="text-2xl font-black text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
-                Your {format === "A" ? "Frame" : "Card"} is Ready!
-              </h2>
-              <p className="text-sm text-gray-500">Looking fire. Download and flex it. 🔥</p>
+          {/*
+            lg+: [photo positioner | form + generate btn]
+            <lg: stacked column
+          */}
+          <div className="px-4 sm:px-8 pb-12 max-w-5xl mx-auto lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start flex flex-col gap-8">
+
+            {/* ── LEFT: photo positioner ── */}
+            <div className="flex flex-col items-center">
+              <ImagePositioner
+                previewUrl={previewUrl}
+                aspectRatio={aspectRatio}
+                crop={crop}
+                onCropChange={setCrop}
+              />
             </div>
 
-            {/* Image preview with glow */}
-            <div className="relative flex justify-center">
-              {/* Glow behind image */}
-              <div className={`absolute inset-0 blur-3xl opacity-40 rounded-full ${format === "A" ? "bg-brand-magenta" : "bg-brand-yellow"}`} style={{top:"10%",bottom:"10%",left:"10%",right:"10%"}}/>
-              <div className={`relative rounded-3xl p-1 bg-gradient-to-b ${format === "A" ? "from-brand-magenta/50 to-brand-yellow/20" : "from-brand-yellow/50 to-brand-magenta/20"} shadow-2xl`}>
-                <img
-                  src={generatedImage}
-                  alt={`Your HH Goa 2026 ${format === "A" ? "PFP Frame" : "Builder Card"}`}
-                  className="w-full rounded-2xl"
-                  style={{ maxWidth: format === "A" ? "380px" : "300px" }}
+            {/* ── RIGHT: form + generate ── */}
+            <div className="flex flex-col gap-6">
+              {format === "B" && (
+                <BuilderForm
+                  name={name}
+                  stack={stack}
+                  builderTitle={builderTitle}
+                  onNameChange={setName}
+                  onStackChange={setStack}
+                  onRegenerateTitle={handleRegenerateTitle}
                 />
+              )}
+
+              {/* Hint card (Format A has no form, show a tip instead) */}
+              {format === "A" && (
+                <div className="p-5 rounded-2xl bg-[#140a20] border border-white/5 flex gap-3 items-start">
+                  <div className="w-8 h-8 rounded-xl bg-brand-magenta/10 border border-brand-magenta/20 flex items-center justify-center flex-shrink-0">
+                    <Lightbulb className="w-4 h-4 text-brand-magenta" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-white text-sm mb-0.5">Positioning tip</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      Drag to pan and scroll (or use the slider) to zoom. Your photo fills the full frame — center your face for the best result.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="p-4 rounded-xl text-sm font-medium bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  {error}
+                </div>
+              )}
+
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className={`w-full flex items-center justify-center gap-2 font-bold text-lg py-4 rounded-2xl transition-all shadow-lg ${
+                  format === "A"
+                    ? "bg-brand-magenta hover:bg-[#d8157a] text-white shadow-[0_0_20px_rgba(233,30,140,0.3)] hover:shadow-[0_0_30px_rgba(233,30,140,0.5)]"
+                    : "bg-brand-yellow hover:bg-[#e6c200] text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isGenerating ? (
+                  <><Loader2 className="w-6 h-6 animate-spin" /> Generating...</>
+                ) : (
+                  <><Sparkles className="w-5 h-5" /> Generate {format === "A" ? "Frame" : "Card"}</>
+                )}
+              </button>
+
+              {/* Event info card — desktop only */}
+              <div className="hidden lg:flex flex-col gap-3 p-5 rounded-2xl bg-[#140a20] border border-white/5">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Event Info</p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <div className="flex justify-between">
+                    <span>Event</span>
+                    <span className="text-white font-semibold">Hacker House Goa 2026</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Dates</span>
+                    <span className="text-white font-semibold">28 – 31 Oct 2026</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Format</span>
+                    <span className="text-white font-semibold">{format === "A" ? "PFP Frame (1080×1080)" : "Builder Card (1080×1620)"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Hashtag</span>
+                    <span className="text-brand-magenta font-bold">#FrameInGoa</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Step 3: Result — responsive two-column on desktop ── */}
+      {generatedImage && (
+        <div className="flex-1 relative z-10 animate-fade-in-up w-full">
+
+          {/* Page title row (always full-width) */}
+          <div className="text-center pt-8 pb-6 px-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-brand-magenta/30 to-brand-yellow/20 text-brand-yellow mb-3 border border-brand-yellow/30 shadow-[0_0_24px_rgba(255,215,0,0.2)]">
+              <PartyPopper className="w-7 h-7" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+              Your {format === "A" ? "Frame" : "Card"} is Ready!
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">Looking fire. Download and flex it. 🔥</p>
+          </div>
+
+          {/*
+            Two-column on lg+:  [card preview | actions]
+            Single column below lg: [card preview] then [actions]
+          */}
+          <div className="px-4 pb-12 max-w-5xl mx-auto lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start flex flex-col gap-8">
+
+            {/* ── LEFT / TOP — Card preview ── */}
+            <div className="flex flex-col items-center gap-4">
+              {/* Glow + image */}
+              <div className="relative flex justify-center w-full">
+                <div
+                  className={`absolute blur-3xl opacity-35 rounded-full pointer-events-none ${format === "A" ? "bg-brand-magenta" : "bg-brand-yellow"}`}
+                  style={{ inset: "8% 15%" }}
+                />
+                <div className={`relative rounded-3xl p-1 shadow-2xl bg-gradient-to-b ${format === "A" ? "from-brand-magenta/50 to-brand-yellow/20" : "from-brand-yellow/50 to-brand-magenta/20"}`}>
+                  <img
+                    src={generatedImage}
+                    alt={`Your HH Goa 2026 ${format === "A" ? "PFP Frame" : "Builder Card"}`}
+                    className="rounded-2xl w-full block"
+                    style={{
+                      maxWidth: format === "A" ? "420px" : "340px",
+                      margin: "0 auto",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Adjust / Start over — below image on all screens */}
+              <div className="grid grid-cols-2 gap-3 w-full" style={{ maxWidth: format === "A" ? "420px" : "340px" }}>
+                <button
+                  onClick={() => { setGeneratedImage(null); setError(null); }}
+                  className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-magenta/40 rounded-2xl text-gray-300 hover:text-white transition-all"
+                >
+                  <RotateCcw className="w-4 h-4" /> Adjust
+                </button>
+                <button
+                  onClick={handleStartOver}
+                  className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-yellow/40 rounded-2xl text-gray-300 hover:text-white transition-all"
+                >
+                  <RefreshCw className="w-4 h-4" /> Start Over
+                </button>
               </div>
             </div>
 
-            {/* Download buttons */}
-            <div className="space-y-3">
-              <div className="grid grid-cols-3 gap-2.5">
+            {/* ── RIGHT / BOTTOM — Actions panel ── */}
+            <div className="flex flex-col gap-5 w-full max-w-md mx-auto lg:max-w-none lg:mx-0 lg:pt-2">
+
+              {/* Section label */}
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Download</p>
+
+              {/* PNG / JPG / PDF */}
+              <div className="grid grid-cols-3 gap-3">
                 {(['png', 'jpg', 'pdf'] as const).map((type) => (
                   <button
                     key={type}
                     onClick={() => handleDownload(type)}
                     disabled={type === 'pdf' && !generatedPdf}
-                    className="group flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl font-black text-sm transition-all bg-gradient-to-b from-brand-yellow to-[#e6c200] text-black shadow-[0_0_16px_rgba(255,215,0,0.2)] hover:shadow-[0_0_28px_rgba(255,215,0,0.45)] hover:scale-[1.04] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="group flex flex-col items-center justify-center gap-2 py-4 rounded-2xl font-black text-sm transition-all bg-gradient-to-b from-brand-yellow to-[#e6c200] text-black shadow-[0_0_16px_rgba(255,215,0,0.15)] hover:shadow-[0_0_28px_rgba(255,215,0,0.45)] hover:scale-[1.04] active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                    <Download className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
                     {type.toUpperCase()}
                   </button>
                 ))}
               </div>
 
+              {/* Share to X */}
               <button
                 onClick={handleShareX}
                 className="w-full flex items-center justify-center gap-2.5 bg-black hover:bg-[#0d0d0d] text-white font-black text-base py-4 px-6 rounded-2xl border-2 border-[#222] hover:border-brand-magenta transition-all shadow-lg hover:shadow-[0_0_24px_rgba(233,30,140,0.25)]"
               >
                 <XIcon className="w-5 h-5" /> Share to X
               </button>
-            </div>
 
-            {/* Adjust / Start over */}
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
-              <button
-                onClick={() => { setGeneratedImage(null); setError(null); }}
-                className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-magenta/30 rounded-2xl text-gray-300 hover:text-white transition-all"
-              >
-                <RotateCcw className="w-4 h-4" /> Adjust
-              </button>
-              <button
-                onClick={handleStartOver}
-                className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-yellow/30 rounded-2xl text-gray-300 hover:text-white transition-all"
-              >
-                <RefreshCw className="w-4 h-4" /> Start Over
-              </button>
-            </div>
+              {/* Divider */}
+              <div className="h-px bg-white/5" />
 
-            {/* Sharing tip */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-yellow/5 to-transparent border border-brand-yellow/15 flex gap-3 items-start">
-              <div className="w-8 h-8 rounded-xl bg-brand-yellow/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-brand-yellow/20">
-                <Lightbulb className="w-4 h-4 text-brand-yellow" />
+              {/* Sharing tip */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-yellow/5 to-transparent border border-brand-yellow/15 flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-xl bg-brand-yellow/10 border border-brand-yellow/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Lightbulb className="w-4 h-4 text-brand-yellow" />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm mb-0.5">Sharing Tip</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    Download first, then attach the image when composing on X for the best quality.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-white text-sm mb-0.5">Sharing Tip</p>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  Download the image first, then attach it when composing your post on X for the best quality.
-                </p>
+
+              {/* Extra info card — desktop only adds context */}
+              <div className="hidden lg:flex flex-col gap-3 p-5 rounded-2xl bg-[#140a20] border border-white/5">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-500">About this card</p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <div className="flex justify-between">
+                    <span>Event</span>
+                    <span className="text-white font-semibold">Hacker House Goa 2026</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Dates</span>
+                    <span className="text-white font-semibold">28 – 31 Oct 2026</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Format</span>
+                    <span className="text-white font-semibold">{format === "A" ? "PFP Frame (1080×1080)" : "Builder Card (1080×1620)"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Hashtag</span>
+                    <span className="text-brand-magenta font-bold">#FrameInGoa</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </main>
   );
 }
