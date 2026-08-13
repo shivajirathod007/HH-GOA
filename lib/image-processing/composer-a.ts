@@ -23,8 +23,8 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
     .resize({ width: LOGO_W })
     .toBuffer();
 
-  // Logo position — top-center, inside border
-  const LOGO_TOP  = BORDER + 24;
+  // Logo position — bottom-center, inside border
+  const LOGO_TOP  = H - LOGO_H - BORDER - 30;
   const LOGO_LEFT = Math.round((W - LOGO_W) / 2);
 
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
@@ -38,17 +38,17 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
   @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 700; font-style: normal; }
 </style>
 <defs>
-  <!-- Top fade — covers logo zone (top 22%), fades into photo -->
+  <!-- Top fade — for top text -->
   <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.96"/>
-    <stop offset="22%"  stop-color="#0D0515" stop-opacity="0.55"/>
-    <stop offset="40%"  stop-color="#0D0515" stop-opacity="0"/>
+    <stop offset="25%"  stop-color="#0D0515" stop-opacity="0.6"/>
+    <stop offset="45%"  stop-color="#0D0515" stop-opacity="0"/>
   </linearGradient>
-  <!-- Bottom dark gradient: for tagline readability -->
+  <!-- Bottom dark gradient: for logo readability -->
   <linearGradient id="botFade" x1="0" y1="1" x2="0" y2="0">
     <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.95"/>
-    <stop offset="35%"  stop-color="#0D0515" stop-opacity="0.55"/>
-    <stop offset="58%"  stop-color="#0D0515" stop-opacity="0"/>
+    <stop offset="35%"  stop-color="#0D0515" stop-opacity="0.65"/>
+    <stop offset="60%"  stop-color="#0D0515" stop-opacity="0"/>
   </linearGradient>
   <!-- Dot texture -->
   <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
@@ -88,9 +88,9 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
 </defs>
 
 <!-- ── Photo sits below all overlays ── -->
-<!-- Top fade — covers logo zone -->
-<rect x="0" y="0"           width="${W}" height="${H * 0.42}" fill="url(#topFade)"/>
-<!-- Bottom fade — covers tagline zone -->
+<!-- Top fade — covers text zone -->
+<rect x="0" y="0"           width="${W}" height="${H * 0.45}" fill="url(#topFade)"/>
+<!-- Bottom fade — covers logo zone -->
 <rect x="0" y="${H * 0.55}" width="${W}" height="${H * 0.45}" fill="url(#botFade)"/>
 
 <!-- Dot + scanline textures -->
@@ -122,28 +122,25 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
 <rect x="0"          y="${H*0.45}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.35)"/>
 <rect x="${W-BORDER}" y="${H*0.45}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.35)"/>
 
-<!-- ── TOP TAGLINE above logo ── -->
-<text x="${cx}" y="${BORDER + 20}"
-  font-family="'Inter',sans-serif" font-weight="700" font-size="0"
-  fill="transparent" text-anchor="middle">spacer</text>
+<!-- ── TOP SECTION ── -->
+<!-- #FrameInGoa -->
+<text x="${cx}" y="${BORDER + 48}"
+  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700" font-size="28"
+  fill="#E91E8C" text-anchor="middle" letter-spacing="4">
+  #FrameInGoa
+</text>
 
-<!-- ── BOTTOM SECTION ── -->
-<!-- Separator line -->
-<rect x="160" y="${H - 110}" width="${W - 320}" height="1.5" rx="1" fill="url(#sepG)"/>
-
-<!-- BUILD · BREAK · BOND  (left aligned in bottom) -->
-<text x="${cx}" y="${H - 76}"
+<!-- BUILD · BREAK · BOND  -->
+<text x="${cx}" y="${BORDER + 88}"
   font-family="'Inter',sans-serif" font-weight="700" font-size="20"
   fill="rgba(255,255,255,0.38)" text-anchor="middle" letter-spacing="9">
   BUILD · BREAK · BOND
 </text>
 
-<!-- #FrameInGoa -->
-<text x="${cx}" y="${H - 36}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700" font-size="28"
-  fill="#E91E8C" text-anchor="middle" letter-spacing="4">
-  #FrameInGoa
-</text>
+<!-- Separator line -->
+<rect x="160" y="${BORDER + 116}" width="${W - 320}" height="1.5" rx="1" fill="url(#sepG)"/>
+
+<!-- ── BOTTOM LOGO ZONE (handled by sharp composite) ── -->
 </svg>`;
 
   return sharp(processedPhoto)

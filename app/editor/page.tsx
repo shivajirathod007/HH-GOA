@@ -678,27 +678,31 @@ function EditorContent() {
 
             {/* ── LEFT / TOP — Card preview ── */}
             <div className="flex flex-col items-center gap-4">
-              {/* Glow + image */}
-              <div className="relative flex justify-center w-full">
+              {/* Glow + image — constrained properly on all screen sizes */}
+              <div className="relative w-full flex justify-center">
+                {/* Glow blob */}
                 <div
-                  className={`absolute blur-3xl opacity-35 rounded-full pointer-events-none ${format === "A" ? "bg-brand-magenta" : "bg-brand-yellow"}`}
-                  style={{ inset: "8% 15%" }}
+                  className={`absolute blur-3xl opacity-30 pointer-events-none rounded-full ${format === "A" ? "bg-brand-magenta" : "bg-brand-yellow"}`}
+                  style={{ inset: "10% 20%" }}
                 />
-                <div className={`relative rounded-3xl p-1 shadow-2xl bg-gradient-to-b ${format === "A" ? "from-brand-magenta/50 to-brand-yellow/20" : "from-brand-yellow/50 to-brand-magenta/20"}`}>
+                {/* Gradient border wrapper — must not overflow viewport */}
+                <div
+                  className={`relative rounded-3xl p-[3px] shadow-2xl bg-gradient-to-b ${format === "A" ? "from-brand-magenta/60 to-brand-yellow/25" : "from-brand-yellow/60 to-brand-magenta/25"} w-full`}
+                  style={{ maxWidth: format === "A" ? "420px" : "300px" }}
+                >
                   <img
                     src={generatedImage}
                     alt={`Your HH Goa 2026 ${format === "A" ? "PFP Frame" : "Builder Card"}`}
-                    className="rounded-2xl w-full block"
-                    style={{
-                      maxWidth: format === "A" ? "420px" : "340px",
-                      margin: "0 auto",
-                    }}
+                    className="rounded-[22px] w-full block"
                   />
                 </div>
               </div>
 
-              {/* Adjust / Start over — below image on all screens */}
-              <div className="grid grid-cols-2 gap-3 w-full" style={{ maxWidth: format === "A" ? "420px" : "340px" }}>
+              {/* Adjust / Start over */}
+              <div
+                className="grid grid-cols-2 gap-3 w-full"
+                style={{ maxWidth: format === "A" ? "420px" : "300px" }}
+              >
                 <button
                   onClick={() => { setGeneratedImage(null); setError(null); }}
                   className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-magenta/40 rounded-2xl text-gray-300 hover:text-white transition-all"
@@ -715,7 +719,7 @@ function EditorContent() {
             </div>
 
             {/* ── RIGHT / BOTTOM — Actions panel ── */}
-            <div className="flex flex-col gap-5 w-full max-w-md mx-auto lg:max-w-none lg:mx-0 lg:pt-2">
+            <div className="flex flex-col gap-5 w-full lg:pt-2">
 
               {/* Section label */}
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Download</p>
