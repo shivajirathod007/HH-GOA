@@ -47,6 +47,12 @@ export default function LandingPage() {
         {/* Content */}
         <div className="relative max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">
           
+          {/* Event badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-magenta/10 border border-brand-magenta/30 text-brand-magenta text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(233,30,140,0.15)]">
+            <span className="w-2 h-2 rounded-full bg-brand-magenta animate-pulse" />
+            Hacker House Goa · 28–31 Oct 2026
+          </div>
+
           {/* Main headline */}
           <h1
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight drop-shadow-2xl"
@@ -63,6 +69,15 @@ export default function LandingPage() {
             instantly. No signup. No data stored. Just pure vibes.
           </p>
 
+          {/* Stats row */}
+          <div className="flex items-center justify-center gap-8 text-sm text-gray-500 font-medium pt-2">
+            <span className="flex items-center gap-1.5"><span className="text-brand-yellow font-black">300+</span> Hackers</span>
+            <span className="w-1 h-1 rounded-full bg-gray-700"/>
+            <span className="flex items-center gap-1.5"><span className="text-brand-magenta font-black">4</span> Days</span>
+            <span className="w-1 h-1 rounded-full bg-gray-700"/>
+            <span className="flex items-center gap-1.5"><span className="text-white font-black">∞</span> Vibes</span>
+          </div>
+
           {/* Format Selection Cards */}
           <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto pt-8">
             {/* Format A — PFP Frame */}
@@ -70,38 +85,69 @@ export default function LandingPage() {
               onClick={() => handleChooseFormat("A")}
               onMouseEnter={() => setHoveredFormat("A")}
               onMouseLeave={() => setHoveredFormat(null)}
-              className="group relative text-left transition-all duration-500 ease-out hover:-translate-y-2"
+              className="group relative text-left transition-all duration-500 ease-out hover:-translate-y-3"
               aria-label="Create PFP Frame - Format A"
             >
-              <div className="absolute inset-0 bg-brand-magenta/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
-              <div className="relative bg-[#140a20] border border-brand-magenta/20 hover:border-brand-magenta/60 rounded-3xl p-6 sm:p-8 overflow-hidden backdrop-blur-sm transition-colors duration-500">
+              {/* Glow bloom */}
+              <div className="absolute -inset-1 bg-brand-magenta/30 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-[36px]" />
+              <div className="relative bg-gradient-to-b from-[#1c0d30] to-[#0f0620] border border-brand-magenta/25 group-hover:border-brand-magenta/70 rounded-[28px] overflow-hidden transition-all duration-500 shadow-2xl shadow-black/60">
+                {/* Card shimmer top bar */}
+                <div className="h-1 w-full bg-gradient-to-r from-brand-magenta via-brand-yellow to-brand-magenta" />
+
                 {/* Preview mockup */}
-                <div className="w-full aspect-square rounded-2xl mb-6 bg-black/40 flex items-center justify-center relative shadow-inner">
-                  <div className="w-[75%] h-[75%] relative rounded-xl overflow-hidden border-2 border-brand-magenta/80 shadow-2xl shadow-brand-magenta/20">
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a2e]">
-                      <Camera className="w-8 h-8 text-gray-400 opacity-60" strokeWidth={1.5} />
+                <div className="p-5 pb-0">
+                  <div className="w-full aspect-square rounded-2xl bg-[#080212] flex items-center justify-center relative overflow-hidden shadow-inner border border-white/5">
+                    {/* Background ambient */}
+                    <div className="absolute top-0 left-0 w-40 h-40 rounded-full bg-brand-magenta/20 blur-3xl" />
+                    <div className="absolute bottom-0 right-0 w-32 h-32 rounded-full bg-brand-yellow/10 blur-2xl" />
+                    
+                    {/* Mock frame card */}
+                    <div className="relative w-[82%] h-[82%] rounded-2xl overflow-hidden border-2 border-brand-magenta shadow-[0_0_30px_rgba(233,30,140,0.35)]">
+                      {/* Gradient bg + photo placeholder */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-[#1a0d2e] to-[#0a0515] flex items-center justify-center">
+                        <div className="w-20 h-20 rounded-full bg-[#2a1545] border-2 border-brand-magenta/40 flex items-center justify-center">
+                          <Camera className="w-9 h-9 text-brand-magenta/60" strokeWidth={1.5} />
+                        </div>
+                      </div>
+                      {/* Top border bar yellow */}
+                      <div className="absolute top-0 w-full h-[6px] bg-brand-yellow" />
+                      {/* Left border bar magenta */}
+                      <div className="absolute left-0 h-full w-[6px] bg-brand-magenta" />
+                      {/* Right border bar yellow */}
+                      <div className="absolute right-0 h-full w-[6px] bg-brand-yellow" />
+                      {/* Bottom bar */}
+                      <div className="absolute bottom-0 w-full h-[6px] bg-brand-magenta" />
+                      {/* Bottom text bar */}
+                      <div className="absolute bottom-[6px] w-full bg-[#0D0515]/90 py-2 px-3 flex items-center justify-between border-t border-brand-magenta/20">
+                        <span className="text-[8px] font-black text-brand-yellow tracking-widest" style={{fontFamily:"Georgia,serif"}}>HACKER HOUSE</span>
+                        <span className="text-[8px] font-black text-brand-magenta tracking-wider">GOA 2026</span>
+                      </div>
+                      {/* Top label */}
+                      <div className="absolute top-[6px] w-full flex items-center justify-center py-1">
+                        <span className="text-[7px] font-bold text-white/50 tracking-[4px]">BUILD · BREAK · BOND</span>
+                      </div>
                     </div>
-                    {/* Bottom bar */}
-                    <div className="absolute bottom-0 w-full h-8 bg-[#0D0515] flex items-center justify-between px-3 border-t border-brand-magenta/30">
-                      <span className="text-[7px] font-bold text-brand-yellow font-serif">HACKER HOUSE</span>
-                      <span className="text-[7px] font-bold text-brand-magenta">GOA 2026</span>
-                    </div>
-                    {/* Top/Side accents */}
-                    <div className="absolute top-0 w-full h-1 bg-brand-yellow" />
+                    {/* Corner tick marks */}
+                    <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-brand-magenta/50 rounded-tl" />
+                    <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-brand-yellow/50 rounded-tr" />
+                    <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-brand-magenta/50 rounded-bl" />
+                    <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-brand-yellow/50 rounded-br" />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 relative z-10">
+                <div className="flex flex-col gap-2 p-6 pt-5">
                   <div className="flex items-center gap-3">
-                    <ImageIcon className="w-6 h-6 text-brand-magenta" strokeWidth={2} />
-                    <h2 className="text-2xl font-bold text-white tracking-wide">PFP Frame</h2>
+                    <div className="w-9 h-9 rounded-lg bg-brand-magenta/15 border border-brand-magenta/30 flex items-center justify-center">
+                      <ImageIcon className="w-5 h-5 text-brand-magenta" strokeWidth={2} />
+                    </div>
+                    <h2 className="text-2xl font-black text-white tracking-wide">PFP Frame</h2>
                   </div>
-                  <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                    The classic square overlay. Perfect for updating your X profile picture.
+                  <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                    Square overlay for X/Twitter. Wrap your photo in HH Goa 2026 branding instantly.
                   </p>
-                  <span className="inline-flex items-center justify-center bg-brand-magenta hover:bg-[#d8157a] text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-[0_0_20px_rgba(233,30,140,0.3)] group-hover:shadow-[0_0_30px_rgba(233,30,140,0.5)]">
-                    Create Frame <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                  </span>
+                  <div className="inline-flex items-center justify-center bg-gradient-to-r from-brand-magenta to-[#c4177a] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(233,30,140,0.25)] group-hover:shadow-[0_0_35px_rgba(233,30,140,0.55)] group-hover:scale-[1.02] duration-300">
+                    Create Frame <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
+                  </div>
                 </div>
               </div>
             </button>
@@ -111,48 +157,84 @@ export default function LandingPage() {
               onClick={() => handleChooseFormat("B")}
               onMouseEnter={() => setHoveredFormat("B")}
               onMouseLeave={() => setHoveredFormat(null)}
-              className="group relative text-left transition-all duration-500 ease-out hover:-translate-y-2"
+              className="group relative text-left transition-all duration-500 ease-out hover:-translate-y-3"
               aria-label="Create Builder Card - Format B"
             >
-              <div className="absolute inset-0 bg-brand-yellow/15 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
-              <div className="relative bg-[#140a20] border border-brand-yellow/20 hover:border-brand-yellow/60 rounded-3xl p-6 sm:p-8 overflow-hidden backdrop-blur-sm transition-colors duration-500">
+              {/* Glow bloom */}
+              <div className="absolute -inset-1 bg-brand-yellow/20 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 rounded-[36px]" />
+              <div className="relative bg-gradient-to-b from-[#1c1405] to-[#0f0c02] border border-brand-yellow/20 group-hover:border-brand-yellow/60 rounded-[28px] overflow-hidden transition-all duration-500 shadow-2xl shadow-black/60">
+                {/* Card shimmer top bar */}
+                <div className="h-1 w-full bg-gradient-to-r from-brand-yellow via-brand-magenta to-brand-yellow" />
+
                 {/* Preview mockup */}
-                <div className="w-full aspect-square rounded-2xl mb-6 bg-black/40 flex items-center justify-center relative shadow-inner">
-                  {/* Mini card preview */}
-                  <div className="w-[65%] h-[90%] rounded-xl bg-[#0D0515] border border-white/10 flex flex-col items-center justify-between py-4 px-3 shadow-2xl shadow-brand-yellow/10">
-                    <div className="text-center w-full">
-                      <p className="text-[10px] font-bold text-brand-yellow font-serif leading-tight">HACKER HOUSE</p>
-                      <p className="text-[7px] text-brand-magenta font-semibold tracking-widest mt-1">GOA 2026</p>
-                      <div className="w-full h-px bg-brand-yellow/30 mt-2" />
+                <div className="p-5 pb-0">
+                  <div className="w-full aspect-square rounded-2xl bg-[#080805] flex items-center justify-center relative overflow-hidden shadow-inner border border-white/5">
+                    {/* Background ambient */}
+                    <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-brand-yellow/15 blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-brand-magenta/10 blur-2xl" />
+
+                    {/* Mini ID card preview */}
+                    <div className="relative w-[58%] h-[88%] rounded-2xl bg-gradient-to-b from-[#13102a] to-[#0a0515] border border-white/10 shadow-2xl overflow-hidden flex flex-col items-center">
+                      {/* Top accent border */}
+                      <div className="w-full h-[5px] bg-gradient-to-r from-brand-yellow to-brand-magenta flex-shrink-0" />
+                      
+                      {/* Logo area */}
+                      <div className="text-center pt-3 px-2 flex-shrink-0">
+                        <p className="text-[9px] font-black text-brand-yellow tracking-[3px] leading-tight" style={{fontFamily:"Georgia,serif"}}>HACKER HOUSE</p>
+                        <p className="text-[6px] text-brand-magenta font-black tracking-[5px] mt-0.5">GOA 2026</p>
+                        <div className="w-full h-px bg-gradient-to-r from-transparent via-brand-yellow/40 to-transparent mt-2" />
+                      </div>
+
+                      {/* Photo placeholder */}
+                      <div className="w-16 h-16 rounded-xl bg-[#1a1a2e] border-2 border-brand-magenta/70 flex items-center justify-center mt-3 flex-shrink-0 shadow-[0_0_15px_rgba(233,30,140,0.3)]">
+                        <Camera className="w-6 h-6 text-brand-magenta/70" strokeWidth={1.5} />
+                      </div>
+
+                      {/* Name + role */}
+                      <div className="text-center px-2 mt-3 flex-shrink-0">
+                        <p className="text-[10px] font-black text-white tracking-wide">Your Name</p>
+                        <p className="text-[7px] text-gray-400 font-mono mt-0.5 tracking-wider">Full Stack Builder</p>
+                      </div>
+
+                      {/* Title badge */}
+                      <div className="mt-2 px-2 py-0.5 rounded-full border border-brand-yellow/40 bg-brand-yellow/5 flex-shrink-0">
+                        <p className="text-[7px] font-black text-brand-yellow tracking-wide flex items-center gap-1">
+                          <Zap className="w-2.5 h-2.5" /> Code Wizard
+                        </p>
+                      </div>
+
+                      {/* Meta info area */}
+                      <div className="w-full px-3 mt-auto mb-3">
+                        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-2" />
+                        <p className="text-[6px] text-white/30 font-mono text-center tracking-widest">28–31 OCT · GOA INDIA</p>
+                        <p className="text-[7px] text-brand-magenta text-center font-black tracking-widest mt-1">#FrameInGoa</p>
+                      </div>
+
+                      {/* Bottom bar */}
+                      <div className="w-full h-[5px] bg-gradient-to-r from-brand-magenta to-brand-yellow flex-shrink-0" />
                     </div>
-                    <div className="w-16 h-16 rounded-xl bg-[#1a1a2e] border-2 border-brand-magenta flex items-center justify-center shadow-lg mt-2">
-                      <Camera className="w-6 h-6 text-gray-400 opacity-80" strokeWidth={1.5} />
-                    </div>
-                    <div className="text-center w-full mt-3">
-                      <p className="text-[10px] font-bold text-white mb-0.5">Your Name</p>
-                      <p className="text-[7px] text-gray-400 font-mono mb-1.5">Full Stack Dev</p>
-                      <p className="text-[8px] font-bold text-brand-yellow flex items-center justify-center gap-1">
-                        <Zap className="w-2.5 h-2.5 fill-brand-yellow" /> Code Wizard
-                      </p>
-                    </div>
-                    <div className="w-full mt-2">
-                      <div className="w-full h-px bg-brand-yellow/30 mb-1" />
-                      <p className="text-[7px] text-brand-magenta text-center font-medium">#FrameInGoa</p>
-                    </div>
+
+                    {/* Corner tick marks */}
+                    <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-brand-yellow/50 rounded-tl" />
+                    <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-brand-magenta/50 rounded-tr" />
+                    <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-brand-yellow/50 rounded-bl" />
+                    <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-brand-magenta/50 rounded-br" />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 relative z-10">
+                <div className="flex flex-col gap-2 p-6 pt-5">
                   <div className="flex items-center gap-3">
-                    <IdCard className="w-6 h-6 text-brand-yellow" strokeWidth={2} />
-                    <h2 className="text-2xl font-bold text-white tracking-wide">Builder Card</h2>
+                    <div className="w-9 h-9 rounded-lg bg-brand-yellow/15 border border-brand-yellow/30 flex items-center justify-center">
+                      <IdCard className="w-5 h-5 text-brand-yellow" strokeWidth={2} />
+                    </div>
+                    <h2 className="text-2xl font-black text-white tracking-wide">Builder Card</h2>
                   </div>
-                  <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                    A beautiful portrait card featuring your stack and auto-generated title.
+                  <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                    Portrait ID card with your photo, stack & an AI-generated hacker title.
                   </p>
-                  <span className="inline-flex items-center justify-center bg-brand-yellow hover:bg-[#e6c200] text-black font-bold py-3 px-6 rounded-xl transition-colors shadow-[0_0_20px_rgba(255,215,0,0.2)] group-hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
-                    Create Card <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                  </span>
+                  <div className="inline-flex items-center justify-center bg-gradient-to-r from-brand-yellow to-[#e6c200] text-black font-black py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(255,215,0,0.15)] group-hover:shadow-[0_0_35px_rgba(255,215,0,0.45)] group-hover:scale-[1.02] duration-300">
+                    Create Card <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">→</span>
+                  </div>
                 </div>
               </div>
             </button>

@@ -345,7 +345,9 @@ function EditorContent() {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedPdf, setGeneratedPdf] = useState<string | null>(null);
   const [generatedFilename, setGeneratedFilename] = useState<string>("");
+  const [generatedPdfFilename, setGeneratedPdfFilename] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -359,6 +361,7 @@ function EditorContent() {
     setPreviewUrl(url);
     setCrop({ x: 0, y: 0, zoom: 1 });
     setGeneratedImage(null);
+    setGeneratedPdf(null);
     setError(null);
   }
 
@@ -369,6 +372,7 @@ function EditorContent() {
   function handleSwitchFormat(f: FormatType) {
     setFormat(f);
     setGeneratedImage(null);
+    setGeneratedPdf(null);
     setError(null);
     setCrop({ x: 0, y: 0, zoom: 1 });
   }
@@ -384,6 +388,7 @@ function EditorContent() {
     setIsGenerating(true);
     setError(null);
     setGeneratedImage(null);
+    setGeneratedPdf(null);
 
     try {
       const formData = new FormData();
@@ -408,6 +413,10 @@ function EditorContent() {
       }
 
       setGeneratedImage(`data:${data.mimeType};base64,${data.imageBase64}`);
+      if (data.pdfBase64) {
+        setGeneratedPdf(`data:application/pdf;base64,${data.pdfBase64}`);
+        setGeneratedPdfFilename(data.pdfFilename);
+      }
       setGeneratedFilename(data.filename);
     } catch {
       setError("Failed to generate image. Check your connection and try again.");
@@ -416,8 +425,46 @@ function EditorContent() {
     }
   }, [file, format, crop, name, stack, builderTitle]);
 
-  function handleDownload() {
+  function handleDownload(type: 'png' | 'jpg' | 'pdf') {
+    if (type === 'pdf' && generatedPdf) {
+      const link = document.createElement("a");
+      link.href = generatedPdf;
+      link.download = generatedPdfFilename || `HHGoa-2026-Print.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
     if (!generatedImage) return;
+
+    if (type === 'jpg') {
+      // Convert PNG to JPG via canvas
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = "#0D0515"; // Dark background to replace transparent areas
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          const jpgUrl = canvas.toDataURL('image/jpeg', 0.95);
+          
+          const link = document.createElement("a");
+          link.href = jpgUrl;
+          link.download = generatedFilename.replace('.png', '.jpg');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      };
+      img.src = generatedImage;
+      return;
+    }
+
+    // Default PNG
     const link = document.createElement("a");
     link.href = generatedImage;
     link.download = generatedFilename || `HHGoa-2026-${format === "A" ? "PFP" : "Builder"}.png`;
@@ -427,7 +474,7 @@ function EditorContent() {
   }
 
   function handleShareX() {
-    const text = encodeURIComponent(`Built in Goa. Now framed for it. #FrameInGoa`);
+    const text = encodeURIComponent(`Built in Goa. See you at HH Goa 2026. #FrameInGoa\n\nCreate yours: https://hhgoa-framelab.com`);
     const url = `https://twitter.com/intent/tweet?text=${text}`;
     window.open(url, "_blank", "noopener,noreferrer");
   }
@@ -438,6 +485,7 @@ function EditorContent() {
     setPreviewUrl(null);
     setCrop({ x: 0, y: 0, zoom: 1 });
     setGeneratedImage(null);
+    setGeneratedPdf(null);
     setError(null);
     setName("");
     setStack("");
@@ -567,69 +615,81 @@ function EditorContent() {
 
         {/* Step 3: Result */}
         {generatedImage && (
-          <div className="space-y-8 animate-fade-in-up">
+          <div className="space-y-6 animate-fade-in-up">
+            {/* Header */}
             <div className="text-center space-y-2">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500/20 text-green-400 mb-2 border border-green-500/30">
-                <PartyPopper className="w-6 h-6" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-brand-magenta/30 to-brand-yellow/20 text-brand-yellow mb-2 border border-brand-yellow/30 shadow-[0_0_24px_rgba(255,215,0,0.2)]">
+                <PartyPopper className="w-7 h-7" />
               </div>
-              <h2 className="text-2xl font-bold text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+              <h2 className="text-2xl font-black text-white tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
                 Your {format === "A" ? "Frame" : "Card"} is Ready!
               </h2>
+              <p className="text-sm text-gray-500">Looking fire. Download and flex it. 🔥</p>
             </div>
 
-            <div className="w-full flex justify-center p-2 rounded-3xl bg-gradient-to-b from-white/10 to-transparent">
-              <img
-                src={generatedImage}
-                alt={`Your HH Goa 2026 ${format === "A" ? "PFP Frame" : "Builder Card"}`}
-                className="w-full rounded-2xl shadow-2xl"
-                style={{
-                  maxWidth: format === "A" ? "360px" : "320px",
-                  border: "4px solid #1a1a2e",
-                }}
-              />
+            {/* Image preview with glow */}
+            <div className="relative flex justify-center">
+              {/* Glow behind image */}
+              <div className={`absolute inset-0 blur-3xl opacity-40 rounded-full ${format === "A" ? "bg-brand-magenta" : "bg-brand-yellow"}`} style={{top:"10%",bottom:"10%",left:"10%",right:"10%"}}/>
+              <div className={`relative rounded-3xl p-1 bg-gradient-to-b ${format === "A" ? "from-brand-magenta/50 to-brand-yellow/20" : "from-brand-yellow/50 to-brand-magenta/20"} shadow-2xl`}>
+                <img
+                  src={generatedImage}
+                  alt={`Your HH Goa 2026 ${format === "A" ? "PFP Frame" : "Builder Card"}`}
+                  className="w-full rounded-2xl"
+                  style={{ maxWidth: format === "A" ? "380px" : "300px" }}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={handleDownload}
-                className="flex items-center justify-center gap-2 bg-brand-yellow hover:bg-[#e6c200] text-black font-bold text-base py-4 px-6 rounded-2xl transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)]"
-              >
-                <Download className="w-5 h-5" /> Download Image
-              </button>
+            {/* Download buttons */}
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2.5">
+                {(['png', 'jpg', 'pdf'] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleDownload(type)}
+                    disabled={type === 'pdf' && !generatedPdf}
+                    className="group flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl font-black text-sm transition-all bg-gradient-to-b from-brand-yellow to-[#e6c200] text-black shadow-[0_0_16px_rgba(255,215,0,0.2)] hover:shadow-[0_0_28px_rgba(255,215,0,0.45)] hover:scale-[1.04] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+                    {type.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
               <button
                 onClick={handleShareX}
-                className="flex items-center justify-center gap-2 bg-black hover:bg-[#111] text-white font-bold text-base py-4 px-6 rounded-2xl border-2 border-[#333] transition-all hover:border-brand-magenta"
+                className="w-full flex items-center justify-center gap-2.5 bg-black hover:bg-[#0d0d0d] text-white font-black text-base py-4 px-6 rounded-2xl border-2 border-[#222] hover:border-brand-magenta transition-all shadow-lg hover:shadow-[0_0_24px_rgba(233,30,140,0.25)]"
               >
                 <XIcon className="w-5 h-5" /> Share to X
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
+            {/* Adjust / Start over */}
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
               <button
-                onClick={() => {
-                  setGeneratedImage(null);
-                  setError(null);
-                }}
-                className="flex items-center justify-center gap-2 text-sm font-semibold py-3 bg-[#140a20] hover:bg-[#1a1a2e] border border-white/10 rounded-xl text-gray-300 transition-colors"
+                onClick={() => { setGeneratedImage(null); setError(null); }}
+                className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-magenta/30 rounded-2xl text-gray-300 hover:text-white transition-all"
               >
                 <RotateCcw className="w-4 h-4" /> Adjust
               </button>
               <button
                 onClick={handleStartOver}
-                className="flex items-center justify-center gap-2 text-sm font-semibold py-3 bg-[#140a20] hover:bg-[#1a1a2e] border border-white/10 rounded-xl text-gray-300 transition-colors"
+                className="flex items-center justify-center gap-2 text-sm font-bold py-3 bg-[#140a20] hover:bg-[#1c1030] border border-white/10 hover:border-brand-yellow/30 rounded-2xl text-gray-300 hover:text-white transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Start Over
               </button>
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#140a20] border border-white/5 flex gap-4 items-start shadow-inner">
-              <div className="w-8 h-8 rounded-full bg-brand-yellow/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            {/* Sharing tip */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-yellow/5 to-transparent border border-brand-yellow/15 flex gap-3 items-start">
+              <div className="w-8 h-8 rounded-xl bg-brand-yellow/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-brand-yellow/20">
                 <Lightbulb className="w-4 h-4 text-brand-yellow" />
               </div>
               <div>
-                <p className="font-bold text-white text-sm mb-1">Sharing Tip</p>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Download the image first, then attach it when composing your post on X for the best quality and presentation.
+                <p className="font-bold text-white text-sm mb-0.5">Sharing Tip</p>
+                <p className="text-gray-400 text-xs leading-relaxed">
+                  Download the image first, then attach it when composing your post on X for the best quality.
                 </p>
               </div>
             </div>

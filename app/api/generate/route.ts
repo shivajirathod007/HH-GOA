@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import { detectMimeFromBuffer, sanitizeFilename } from '@/lib/validation';
 import { composeFormatA } from '@/lib/image-processing/composer-a';
 import { composeFormatB } from '@/lib/image-processing/composer-b';
+import { generatePrintPdf } from '@/lib/image-processing/pdf-generator';
 import { UPLOAD, RATE_LIMIT } from '@/lib/constants';
 
 interface RateLimitData {
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
       .toBuffer();
 
     // Parse params
-    const format = formData.get('format') as string;
+    const format = formData.get('format') as 'A' | 'B';
     const cropData = {
       x: parseFloat(formData.get('cropX') as string || '0'),
       y: parseFloat(formData.get('cropY') as string || '0'),
@@ -104,11 +105,11 @@ export async function POST(req: NextRequest) {
     };
 
     let finalBuffer: Buffer;
-    let filename: string;
+    let filenameBase: string;
 
     if (format === 'A') {
       finalBuffer = await composeFormatA(processedBuffer, cropData);
-      filename = 'HHGoa-2026-Profile-PFP.png';
+      filenameBase = 'HHGoa-2026-Profile-PFP';
     } else if (format === 'B') {
       const name = (formData.get('name') as string || '').trim();
       const stack = (formData.get('stack') as string || '').trim();
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
 
       finalBuffer = await composeFormatB(processedBuffer, cropData, name, stack, title);
       const safeName = sanitizeFilename(name);
-      filename = `HHGoa-2026-${safeName}-Builder.png`;
+      filenameBase = `HHGoa-2026-${safeName}-Builder`;
     } else {
       return NextResponse.json(
         { success: false, error: 'Invalid format. Choose A or B.' },
@@ -132,12 +133,18 @@ export async function POST(req: NextRequest) {
     }
 
     const imageBase64 = finalBuffer.toString('base64');
+    
+    // Generate PDF for print
+    const pdfBuffer = await generatePrintPdf(finalBuffer, format);
+    const pdfBase64 = pdfBuffer.toString('base64');
 
     return NextResponse.json({
       success: true,
       imageBase64,
+      pdfBase64,
       mimeType: 'image/png',
-      filename,
+      filename: `${filenameBase}.png`,
+      pdfFilename: `${filenameBase}-Print.pdf`,
     });
   } catch (err) {
     console.error('Image generation error:', err);
