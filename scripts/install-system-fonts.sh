@@ -13,7 +13,11 @@ curl -s -L "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/static
 curl -s -L "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/static/Inter-Regular.ttf" -o "$FONT_DIR/Inter-Regular.ttf"
 curl -s -L "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/static/JetBrainsMono-Bold.ttf" -o "$FONT_DIR/JetBrainsMono-Bold.ttf"
 
-# Rebuild font cache
-fc-cache -f -v "$HOME/.local/share/fonts"
+# Rebuild font cache if possible
+if command -v fc-cache >/dev/null 2>&1; then
+  fc-cache -f -v "$HOME/.local/share/fonts"
+else
+  echo "fc-cache not found, skipping font cache rebuild."
+fi
 
 echo "Fonts installed successfully."
