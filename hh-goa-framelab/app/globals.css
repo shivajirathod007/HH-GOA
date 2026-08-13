@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+/* ==============================
+   HH Goa FrameLab — Design System
+   Colors extracted from official branding assets
+   ============================== */
+
+@theme {
+  /* Brand Colors */
+  --color-brand-magenta: #E91E8C;
+  --color-brand-magenta-dark: #C4177A;
+  --color-brand-magenta-light: #F74DA8;
+  --color-brand-yellow: #FFD700;
+  --color-brand-yellow-warm: #FFC300;
+  --color-brand-yellow-light: #FFE44D;
+
+  /* Background system */
+  --color-bg-deep: #0D0515;
+  --color-bg-card: #150B28;
+  --color-bg-surface: #1E1033;
+  --color-bg-elevated: #2A1845;
+
+  /* Text */
+  --color-text-primary: #F5F3F7;
+  --color-text-secondary: #B8B0C4;
+  --color-text-muted: #7A7189;
+
+  /* Fonts */
+  --font-display: "Playfair Display", "Georgia", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Transitions */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==============================
+   Base Styles
+   ============================== */
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-brand-magenta) 40%, transparent);
+  color: white;
+}
+
+/* ==============================
+   Component Utilities
+   ============================== */
+
+/* Glowing border effect */
+.glow-border {
+  position: relative;
+}
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-magenta),
+    var(--color-brand-yellow),
+    var(--color-brand-magenta)
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-smooth);
+}
+.glow-border:hover::before {
+  opacity: 1;
+}
+
+/* CTA Button base */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-smooth);
+  border: none;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--color-brand-yellow);
+  outline-offset: 2px;
+}
+
+.btn-magenta {
+  background: linear-gradient(135deg, var(--color-brand-magenta), var(--color-brand-magenta-dark));
+  color: white;
+}
+.btn-magenta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--color-brand-magenta) 40%, transparent);
+}
+
+.btn-yellow {
+  background: linear-gradient(135deg, var(--color-brand-yellow), var(--color-brand-yellow-warm));
+  color: #0D0515;
+}
+.btn-yellow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--color-brand-yellow) 30%, transparent);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-bg-elevated);
+}
+.btn-outline:hover {
+  border-color: var(--color-brand-magenta);
+  background: color-mix(in srgb, var(--color-brand-magenta) 10%, transparent);
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--color-bg-elevated);
+  border-radius: 16px;
+  transition: all 0.2s var(--ease-smooth);
+  cursor: pointer;
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--color-brand-magenta);
+  background: color-mix(in srgb, var(--color-brand-magenta) 5%, transparent);
+}
+
+/* Card */
+.card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-bg-elevated);
+  border-radius: 16px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-magenta),
+    var(--color-brand-yellow)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-surface) 25%,
+    var(--color-bg-elevated) 50%,
+    var(--color-bg-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Subtle float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ==============================
+   Responsive utilities
+   ============================== */
+@media (max-width: 640px) {
+  .btn-primary {
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
