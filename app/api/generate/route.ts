@@ -104,39 +104,51 @@ export async function POST(req: NextRequest) {
       zoom: Math.max(1, Math.min(5, parseFloat(formData.get('cropZoom') as string || '1'))),
     };
 
+    console.log(`[Generate API] Parsed format ${format}, cropData:`, cropData);
+
     let finalBuffer: Buffer;
     let filenameBase: string;
 
-    if (format === 'A') {
-      finalBuffer = await composeFormatA(processedBuffer, cropData);
-      filenameBase = 'HHGoa-2026-Profile-PFP';
-    } else if (format === 'B') {
-      const name = (formData.get('name') as string || '').trim();
-      const stack = (formData.get('stack') as string || '').trim();
-      const title = (formData.get('title') as string || '').trim();
+    try {
+      if (format === 'A') {
+        console.log(`[Generate API] Starting composeFormatA...`);
+        finalBuffer = await composeFormatA(processedBuffer, cropData);
+        filenameBase = 'HHGoa-2026-Profile-PFP';
+      } else if (format === 'B') {
+        const name = (formData.get('name') as string || '').trim();
+        const stack = (formData.get('stack') as string || '').trim();
+        const title = (formData.get('title') as string || '').trim();
 
-      if (!name || !stack || !title) {
+        if (!name || !stack || !title) {
+          return NextResponse.json(
+            { success: false, error: 'Name, stack, and title are required for Builder Card.' },
+            { status: 400 }
+          );
+        }
+
+        console.log(`[Generate API] Starting composeFormatB...`);
+        finalBuffer = await composeFormatB(processedBuffer, cropData, name, stack, title);
+        const safeName = sanitizeFilename(name);
+        filenameBase = `HHGoa-2026-${safeName}-Builder`;
+      } else {
         return NextResponse.json(
-          { success: false, error: 'Name, stack, and title are required for Builder Card.' },
+          { success: false, error: 'Invalid format. Choose A or B.' },
           { status: 400 }
         );
       }
-
-      finalBuffer = await composeFormatB(processedBuffer, cropData, name, stack, title);
-      const safeName = sanitizeFilename(name);
-      filenameBase = `HHGoa-2026-${safeName}-Builder`;
-    } else {
-      return NextResponse.json(
-        { success: false, error: 'Invalid format. Choose A or B.' },
-        { status: 400 }
-      );
+      console.log(`[Generate API] Composer finished successfully.`);
+    } catch (composeError) {
+      console.error(`[Generate API] Error during composition (SVG or Sharp composite):`, composeError);
+      throw composeError;
     }
 
     const imageBase64 = finalBuffer.toString('base64');
     
     // Generate PDF for print
+    console.log(`[Generate API] Generating PDF...`);
     const pdfBuffer = await generatePrintPdf(finalBuffer, format);
     const pdfBase64 = pdfBuffer.toString('base64');
+    console.log(`[Generate API] PDF generated successfully.`);
 
     return NextResponse.json({
       success: true,
