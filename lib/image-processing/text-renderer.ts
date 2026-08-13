@@ -1,4 +1,4 @@
-import opentype from 'opentype.js';
+import { parse } from 'opentype.js';
 import { fonts } from './fonts';
 
 function base64ToArrayBuffer(base64: string) {
@@ -9,10 +9,10 @@ function base64ToArrayBuffer(base64: string) {
 
 // Pre-parse the fonts in memory
 const parsedFonts = {
-  Playfair: opentype.parse(base64ToArrayBuffer(fonts.Playfair)),
-  Inter: opentype.parse(base64ToArrayBuffer(fonts.Inter)),
-  InterRegular: opentype.parse(base64ToArrayBuffer(fonts.InterRegular)),
-  JetBrains: opentype.parse(base64ToArrayBuffer(fonts.JetBrains))
+  Playfair: parse(base64ToArrayBuffer(fonts.Playfair)),
+  Inter: parse(base64ToArrayBuffer(fonts.Inter)),
+  InterRegular: parse(base64ToArrayBuffer(fonts.InterRegular)),
+  JetBrains: parse(base64ToArrayBuffer(fonts.JetBrains))
 };
 
 /**
