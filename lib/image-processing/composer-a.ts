@@ -5,134 +5,144 @@ import { processUserPhoto, CropData } from './image-utils';
 export const runtime = 'nodejs';
 
 export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): Promise<Buffer> {
-  const width = 1080;
-  const height = 1080;
-  const photoSize = 1080;
+  const W = 1080;
+  const H = 1080;
+  const cx = W / 2;
+  const BORDER = 14;
 
-  const processedPhoto = await processUserPhoto(photoBuffer, photoSize, photoSize, cropData);
+  // Process photo full-bleed
+  const processedPhoto = await processUserPhoto(photoBuffer, W, H, cropData);
 
+  // Load new transparent logo — 1000×300 source, render at 860px wide to fit inside borders
+  const LOGO_W = 860;
+  // aspect 1000:300 → height at 860px = 860 * 300/1000 = 258px
+  const LOGO_H = Math.round(860 * 300 / 1000);
   const assetsDir = path.join(process.cwd(), 'public', 'assets');
-  const hhLogo = await sharp(path.join(assetsDir, 'hacker-house-logo.png'))
-    .resize({ width: 680 })
+  const hhLogo = await sharp(path.join(assetsDir, 'hh-goa-logo-transparent.png'))
+    .resize({ width: LOGO_W })
     .toBuffer();
 
-  const goaLogo = await sharp(path.join(assetsDir, 'goa-logo.png'))
-    .resize({ width: 160 })
-    .toBuffer();
+  // Logo position — bottom-center, above the tagline bar
+  // Bottom border=14, hashtag at ~H-36, separator at ~H-110
+  // Logo bottom edge should sit just above separator: H - 120
+  const LOGO_BOTTOM = H - 120;
+  const LOGO_TOP    = LOGO_BOTTOM - LOGO_H;   // H - 120 - 258 = 702
+  const LOGO_LEFT   = Math.round((W - LOGO_W) / 2);
 
-  const svgOverlay = `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Top dark fade -->
-        <linearGradient id="gradTop" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0D0515" stop-opacity="0.95" />
-          <stop offset="45%" stop-color="#0D0515" stop-opacity="0.4" />
-          <stop offset="100%" stop-color="#0D0515" stop-opacity="0" />
-        </linearGradient>
-        <!-- Bottom dark fade -->
-        <linearGradient id="gradBottom" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stop-color="#0D0515" stop-opacity="0.98" />
-          <stop offset="50%" stop-color="#0D0515" stop-opacity="0.55" />
-          <stop offset="100%" stop-color="#0D0515" stop-opacity="0" />
-        </linearGradient>
-        <!-- Magenta glow for photo border -->
-        <filter id="glowMagenta" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="12" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <!-- Yellow glow -->
-        <filter id="glowYellow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="10" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <!-- Scanline pattern -->
-        <pattern id="scanlines" x="0" y="0" width="1080" height="4" patternUnits="userSpaceOnUse">
-          <rect x="0" y="0" width="1080" height="2" fill="transparent"/>
-          <rect x="0" y="2" width="1080" height="2" fill="rgba(0,0,0,0.07)"/>
-        </pattern>
-        <!-- Halftone dots bg accent -->
-        <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-          <circle cx="12" cy="12" r="1.5" fill="rgba(255,255,255,0.04)"/>
-        </pattern>
-        <!-- Corner gradient -->
-        <radialGradient id="cornerGlow" cx="0%" cy="0%" r="60%">
-          <stop offset="0%" stop-color="#E91E8C" stop-opacity="0.2"/>
-          <stop offset="100%" stop-color="#E91E8C" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="cornerGlowBR" cx="100%" cy="100%" r="60%">
-          <stop offset="0%" stop-color="#FFD700" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
+  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <!-- Top fade — light, just enough to show border area, face fully visible -->
+  <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.75"/>
+    <stop offset="18%"  stop-color="#0D0515" stop-opacity="0.1"/>
+    <stop offset="30%"  stop-color="#0D0515" stop-opacity="0"/>
+  </linearGradient>
+  <!-- Bottom dark gradient: deep enough for logo + tagline readability -->
+  <linearGradient id="botFade" x1="0" y1="1" x2="0" y2="0">
+    <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.98"/>
+    <stop offset="45%"  stop-color="#0D0515" stop-opacity="0.82"/>
+    <stop offset="72%"  stop-color="#0D0515" stop-opacity="0"/>
+  </linearGradient>
+  <!-- Dot texture -->
+  <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+    <circle cx="11" cy="11" r="1" fill="rgba(255,255,255,0.035)"/>
+  </pattern>
+  <!-- Scanlines -->
+  <pattern id="scan" width="${W}" height="4" patternUnits="userSpaceOnUse">
+    <rect x="0" y="2" width="${W}" height="2" fill="rgba(0,0,0,0.06)"/>
+  </pattern>
+  <!-- Corner glows -->
+  <radialGradient id="glTL" cx="0%" cy="0%" r="55%">
+    <stop offset="0%"   stop-color="#E91E8C" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#E91E8C" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="glBR" cx="100%" cy="100%" r="55%">
+    <stop offset="0%"   stop-color="#FFD700" stop-opacity="0.13"/>
+    <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+  </radialGradient>
+  <!-- Border edge gradients -->
+  <linearGradient id="edgeL" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#E91E8C" stop-opacity="1"/>
+    <stop offset="50%"  stop-color="#FFD700" stop-opacity="0.7"/>
+    <stop offset="100%" stop-color="#E91E8C" stop-opacity="0.4"/>
+  </linearGradient>
+  <linearGradient id="edgeR" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#FFD700" stop-opacity="1"/>
+    <stop offset="50%"  stop-color="#E91E8C" stop-opacity="0.7"/>
+    <stop offset="100%" stop-color="#FFD700" stop-opacity="0.4"/>
+  </linearGradient>
+  <!-- Separator -->
+  <linearGradient id="sepG" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+    <stop offset="35%"  stop-color="rgba(233,30,140,0.5)"/>
+    <stop offset="65%"  stop-color="rgba(255,215,0,0.5)"/>
+    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+  </linearGradient>
+</defs>
 
-      <!-- Overlays -->
-      <rect x="0" y="0" width="${width}" height="420" fill="url(#gradTop)" />
-      <rect x="0" y="${height - 420}" width="${width}" height="420" fill="url(#gradBottom)" />
+<!-- ── Photo sits below all overlays ── -->
+<!-- Top fade — just covers the top border strip -->
+<rect x="0" y="0"           width="${W}" height="${H * 0.28}" fill="url(#topFade)"/>
+<!-- Bottom fade — covers logo + tagline zone (bottom 45%) -->
+<rect x="0" y="${H * 0.35}" width="${W}" height="${H * 0.65}" fill="url(#botFade)"/>
 
-      <!-- Dot texture -->
-      <rect x="0" y="0" width="${width}" height="${height}" fill="url(#dots)" />
+<!-- Dot + scanline textures -->
+<rect x="0" y="0" width="${W}" height="${H}" fill="url(#dots)"/>
+<rect x="0" y="0" width="${W}" height="${H}" fill="url(#scan)"/>
 
-      <!-- Corner accent glows -->
-      <rect x="0" y="0" width="400" height="400" fill="url(#cornerGlow)" />
-      <rect x="${width - 400}" y="${height - 400}" width="400" height="400" fill="url(#cornerGlowBR)" />
+<!-- Corner ambient glows -->
+<rect x="0"       y="0"       width="380" height="380" fill="url(#glTL)"/>
+<rect x="${W-380}" y="${H-380}" width="380" height="380" fill="url(#glBR)"/>
 
-      <!-- Scanlines -->
-      <rect x="0" y="0" width="${width}" height="${height}" fill="url(#scanlines)" />
+<!-- ── BORDER FRAME ── -->
+<rect x="0"          y="0"          width="${W}"      height="${BORDER}" fill="#FFD700"/>
+<rect x="0"          y="${H-BORDER}" width="${W}"      height="${BORDER}" fill="#E91E8C"/>
+<rect x="0"          y="${BORDER}"  width="${BORDER}"  height="${H-BORDER*2}" fill="url(#edgeL)"/>
+<rect x="${W-BORDER}" y="${BORDER}"  width="${BORDER}"  height="${H-BORDER*2}" fill="url(#edgeR)"/>
 
-      <!-- ── BORDER FRAME ── -->
-      <!-- Top bar - yellow -->
-      <rect x="0" y="0" width="${width}" height="16" fill="#FFD700"/>
-      <!-- Bottom bar - magenta -->
-      <rect x="0" y="${height - 16}" width="${width}" height="16" fill="#E91E8C"/>
-      <!-- Left bar - magenta -->
-      <rect x="0" y="0" width="16" height="${height}" fill="#E91E8C"/>
-      <!-- Right bar - yellow -->
-      <rect x="${width - 16}" y="0" width="16" height="${height}" fill="#FFD700"/>
+<!-- Corner accent squares -->
+<rect x="0"          y="0"          width="38" height="38" fill="#FFD700"/>
+<rect x="${W-38}"    y="0"          width="38" height="38" fill="#E91E8C"/>
+<rect x="0"          y="${H-38}"    width="38" height="38" fill="#E91E8C"/>
+<rect x="${W-38}"    y="${H-38}"    width="38" height="38" fill="#FFD700"/>
+<!-- Corner insets -->
+<rect x="${BORDER}"  y="${BORDER}"  width="24" height="24" fill="#0D0515"/>
+<rect x="${W-38}"    y="${BORDER}"  width="24" height="24" fill="#0D0515"/>
+<rect x="${BORDER}"  y="${H-38}"    width="24" height="24" fill="#0D0515"/>
+<rect x="${W-38}"    y="${H-38}"    width="24" height="24" fill="#0D0515"/>
 
-      <!-- Corner squares (accent) -->
-      <rect x="0" y="0" width="40" height="40" fill="#FFD700"/>
-      <rect x="${width - 40}" y="0" width="40" height="40" fill="#E91E8C"/>
-      <rect x="0" y="${height - 40}" width="40" height="40" fill="#E91E8C"/>
-      <rect x="${width - 40}" y="${height - 40}" width="40" height="40" fill="#FFD700"/>
+<!-- Side ticks -->
+<rect x="0"          y="${H*0.45}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.35)"/>
+<rect x="${W-BORDER}" y="${H*0.45}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.35)"/>
 
-      <!-- Corner notch insets -->
-      <rect x="16" y="16" width="24" height="24" fill="#0D0515"/>
-      <rect x="${width - 40}" y="16" width="24" height="24" fill="#0D0515"/>
-      <rect x="16" y="${height - 40}" width="24" height="24" fill="#0D0515"/>
-      <rect x="${width - 40}" y="${height - 40}" width="24" height="24" fill="#0D0515"/>
+<!-- ── TOP TAGLINE above logo ── -->
+<text x="${cx}" y="${BORDER + 20}"
+  font-family="'Inter',sans-serif" font-weight="700" font-size="0"
+  fill="transparent" text-anchor="middle">spacer</text>
 
-      <!-- ── BOTTOM HASHTAG ── -->
-      <text x="${width / 2}" y="${height - 52}" 
-        font-family="'JetBrains Mono', monospace" 
-        font-weight="700" 
-        font-size="30" 
-        fill="#E91E8C" 
-        text-anchor="middle" 
-        letter-spacing="4">
-        #FrameInGoa
-      </text>
+<!-- ── BOTTOM SECTION ── -->
+<!-- Separator line -->
+<rect x="160" y="${H - 110}" width="${W - 320}" height="1.5" rx="1" fill="url(#sepG)"/>
 
-      <!-- Divider line above hashtag -->
-      <line x1="200" y1="${height - 82}" x2="${width - 200}" y2="${height - 82}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+<!-- BUILD · BREAK · BOND  (left aligned in bottom) -->
+<text x="${cx}" y="${H - 76}"
+  font-family="'Inter',sans-serif" font-weight="700" font-size="20"
+  fill="rgba(255,255,255,0.38)" text-anchor="middle" letter-spacing="9">
+  BUILD · BREAK · BOND
+</text>
 
-      <!-- ── BUILD · BREAK · BOND ── -->
-      <text x="${width / 2}" y="68"
-        font-family="'Inter', sans-serif"
-        font-weight="700"
-        font-size="22"
-        fill="rgba(255,255,255,0.5)"
-        text-anchor="middle"
-        letter-spacing="10">
-        BUILD · BREAK · BOND
-      </text>
-    </svg>
-  `;
+<!-- #FrameInGoa -->
+<text x="${cx}" y="${H - 36}"
+  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700" font-size="28"
+  fill="#E91E8C" text-anchor="middle" letter-spacing="4">
+  #FrameInGoa
+</text>
+</svg>`;
 
   return sharp(processedPhoto)
     .composite([
-      { input: Buffer.from(svgOverlay), top: 0, left: 0 },
-      { input: hhLogo, top: 86, left: Math.round((width - 680) / 2) },
-      { input: goaLogo, top: 50, left: Math.round((width - 160) / 2) + 310 },
+      { input: Buffer.from(svg),  top: 0,        left: 0         },
+      { input: hhLogo,            top: LOGO_TOP,  left: LOGO_LEFT },
     ])
     .png()
     .toBuffer();
