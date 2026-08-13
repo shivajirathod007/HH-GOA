@@ -1,3 +1,4 @@
+import { fonts } from "./fonts";
 import sharp from 'sharp';
 import path from 'path';
 import { processUserPhoto, CropData } from './image-utils';
@@ -41,37 +42,36 @@ export async function composeFormatB(
   const nameFontSize = safeName.length > 20 ? (safeName.length > 24 ? 58 : 68) : 80;
 
   // ── Layout: strict top-to-bottom with explicit gaps ─────────────
-  // Logo: hh-goa-logo-transparent.png is 1000×300 → render at W-80 = 1000px wide
-  // Rendered at 1000px wide → still 300px tall (1:1 scale from source)
-  const LOGO_W   = 1000;
-  const LOGO_H   = 300;  // exact height at 1000px wide
-  const LOGO_TOP = BORDER + 20;           // 34
-  const LOGO_LEFT = (W - LOGO_W) / 2;    // 40
+  const LOGO_W    = 1000;
+  const LOGO_H    = 300;
+  const LOGO_TOP  = BORDER + 20;           // 34
+  const LOGO_LEFT = (W - LOGO_W) / 2;     // 40
 
-  // Photo
+  // Slogan sits between logo and photo — above the image
+  const SLOGAN_ABOVE_Y = LOGO_TOP + LOGO_H + 44;  // baseline ~378
+
+  // Photo starts below slogan with a gap
   const PHOTO_SIZE = 540;
-  const PHOTO_GAP  = 48;                  // gap between logo bottom and photo top
-  const PHOTO_TOP  = LOGO_TOP + LOGO_H + PHOTO_GAP;  // 382
-  const PHOTO_LEFT = (W - PHOTO_SIZE) / 2;           // 270
+  const PHOTO_TOP  = SLOGAN_ABOVE_Y + 56;           // ~434
+  const PHOTO_LEFT = (W - PHOTO_SIZE) / 2;
 
-  // Identity block (below photo)
-  const NAME_Y   = PHOTO_TOP + PHOTO_SIZE + 80;  // baseline
-  const STACK_Y  = NAME_Y + 62;
-  const BADGE_TOP = STACK_Y + 44;        // badge rect top
-  const BADGE_H  = 68;
-  const SLOGAN_Y = BADGE_TOP + BADGE_H + 52;  // slogan baseline — 52px below badge bottom
+  // Identity block below photo — extra breathing room
+  const NAME_Y    = PHOTO_TOP + PHOTO_SIZE + 96;   // ~1070
+  const STACK_Y   = NAME_Y + 64;
+  const BADGE_TOP = STACK_Y + 46;
+  const BADGE_H   = 68;
 
-  // Separator + meta
-  const DIV1_Y = SLOGAN_Y + 48;
+  // Separator + meta (no slogan here anymore)
+  const DIV1_Y = BADGE_TOP + BADGE_H + 56;
   const ID_Y   = DIV1_Y + 62;
   const DATE_Y = ID_Y + 72;
   const LOC_Y  = DATE_Y + 72;
 
   // Skyline + footer
-  const DIV2_Y    = LOC_Y + 56;
-  const SKY_Y     = DIV2_Y + 16;
-  const FOOT_Y    = H - 82;
-  const HASH_Y    = H - 32;
+  const DIV2_Y = LOC_Y + 56;
+  const SKY_Y  = DIV2_Y + 16;
+  const FOOT_Y = H - 82;
+  const HASH_Y = H - 32;
 
   // Badge width
   const charW  = 18;
@@ -97,8 +97,18 @@ export async function composeFormatB(
     .resize({ width: LOGO_W })
     .toBuffer();
 
-  // ── SVG overlay ─────────────────────────────────────────────────
+
+// ── SVG overlay ─────────────────────────────────────────────────
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+<style>
+  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 700; font-style: normal; }
+  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 900; font-style: normal; }
+  @font-face { font-family: 'Inter'; src: url('${fonts.Inter}'); font-weight: 700; font-style: normal; }
+  @font-face { font-family: 'Inter'; src: url('${fonts.InterRegular}'); font-weight: 500; font-style: normal; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 500; font-style: normal; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 600; font-style: normal; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 700; font-style: normal; }
+</style>
 <defs>
   <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%"   stop-color="#110621"/>
@@ -187,6 +197,13 @@ export async function composeFormatB(
 <!-- Logo zone fade -->
 <rect x="0" y="0" width="${W}" height="${LOGO_TOP + LOGO_H + 40}" fill="url(#logoBg)"/>
 
+<!-- SLOGAN — above the photo -->
+<text x="${cx}" y="${SLOGAN_ABOVE_Y}"
+  font-family="'Playfair Display','Georgia',serif" font-weight="700"
+  font-size="34" text-anchor="middle" letter-spacing="0.5">
+  <tspan fill="#FFD700">Your Build.</tspan><tspan fill="rgba(255,255,255,0.5)"> Your Goa.</tspan>
+</text>
+
 <!-- Photo glow -->
 <rect x="${PHOTO_LEFT - 14}" y="${PHOTO_TOP - 14}"
   width="${PHOTO_SIZE + 28}" height="${PHOTO_SIZE + 28}" rx="44"
@@ -220,13 +237,6 @@ export async function composeFormatB(
 <text x="${cx}" y="${BADGE_TOP + BADGE_H * 0.67}"
   font-family="'Inter',sans-serif" font-weight="700" font-size="29"
   fill="#FFD700" text-anchor="middle">${safeTitle}</text>
-
-<!-- SLOGAN (below badge, 52px gap) -->
-<text x="${cx}" y="${SLOGAN_Y}"
-  font-family="'Playfair Display','Georgia',serif" font-weight="600"
-  font-size="30" text-anchor="middle" letter-spacing="0.5">
-  <tspan fill="#FFD700">Your Build.</tspan><tspan fill="rgba(255,255,255,0.42)"> Your Goa.</tspan>
-</text>
 
 <!-- DIVIDER 1 -->
 <rect x="90" y="${DIV1_Y}" width="${W - 180}" height="1.5" rx="1" fill="url(#sepG)"/>

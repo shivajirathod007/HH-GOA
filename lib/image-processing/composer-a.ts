@@ -1,3 +1,4 @@
+import { fonts } from "./fonts";
 import sharp from 'sharp';
 import path from 'path';
 import { processUserPhoto, CropData } from './image-utils';
@@ -13,35 +14,41 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
   // Process photo full-bleed
   const processedPhoto = await processUserPhoto(photoBuffer, W, H, cropData);
 
-  // Load new transparent logo — 1000×300 source, render at 860px wide to fit inside borders
-  const LOGO_W = 860;
-  // aspect 1000:300 → height at 860px = 860 * 300/1000 = 258px
-  const LOGO_H = Math.round(860 * 300 / 1000);
+  // Load new transparent logo — 1000×300 source, render at 640px wide — top zone, won't cover face
+  const LOGO_W = 640;
+  // aspect 1000:300 → height at 640px = 192px
+  const LOGO_H = Math.round(640 * 300 / 1000);
   const assetsDir = path.join(process.cwd(), 'public', 'assets');
   const hhLogo = await sharp(path.join(assetsDir, 'hh-goa-logo-transparent.png'))
     .resize({ width: LOGO_W })
     .toBuffer();
 
-  // Logo position — bottom-center, above the tagline bar
-  // Bottom border=14, hashtag at ~H-36, separator at ~H-110
-  // Logo bottom edge should sit just above separator: H - 120
-  const LOGO_BOTTOM = H - 120;
-  const LOGO_TOP    = LOGO_BOTTOM - LOGO_H;   // H - 120 - 258 = 702
-  const LOGO_LEFT   = Math.round((W - LOGO_W) / 2);
+  // Logo position — top-center, inside border
+  const LOGO_TOP  = BORDER + 24;
+  const LOGO_LEFT = Math.round((W - LOGO_W) / 2);
 
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+<style>
+  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 700; font-style: normal; }
+  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 900; font-style: normal; }
+  @font-face { font-family: 'Inter'; src: url('${fonts.Inter}'); font-weight: 700; font-style: normal; }
+  @font-face { font-family: 'Inter'; src: url('${fonts.InterRegular}'); font-weight: 500; font-style: normal; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 500; font-style: normal; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 600; font-style: normal; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 700; font-style: normal; }
+</style>
 <defs>
-  <!-- Top fade — light, just enough to show border area, face fully visible -->
+  <!-- Top fade — covers logo zone (top 22%), fades into photo -->
   <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.75"/>
-    <stop offset="18%"  stop-color="#0D0515" stop-opacity="0.1"/>
-    <stop offset="30%"  stop-color="#0D0515" stop-opacity="0"/>
+    <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.96"/>
+    <stop offset="22%"  stop-color="#0D0515" stop-opacity="0.55"/>
+    <stop offset="40%"  stop-color="#0D0515" stop-opacity="0"/>
   </linearGradient>
-  <!-- Bottom dark gradient: deep enough for logo + tagline readability -->
+  <!-- Bottom dark gradient: for tagline readability -->
   <linearGradient id="botFade" x1="0" y1="1" x2="0" y2="0">
-    <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.98"/>
-    <stop offset="45%"  stop-color="#0D0515" stop-opacity="0.82"/>
-    <stop offset="72%"  stop-color="#0D0515" stop-opacity="0"/>
+    <stop offset="0%"   stop-color="#0D0515" stop-opacity="0.95"/>
+    <stop offset="35%"  stop-color="#0D0515" stop-opacity="0.55"/>
+    <stop offset="58%"  stop-color="#0D0515" stop-opacity="0"/>
   </linearGradient>
   <!-- Dot texture -->
   <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
@@ -81,10 +88,10 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
 </defs>
 
 <!-- ── Photo sits below all overlays ── -->
-<!-- Top fade — just covers the top border strip -->
-<rect x="0" y="0"           width="${W}" height="${H * 0.28}" fill="url(#topFade)"/>
-<!-- Bottom fade — covers logo + tagline zone (bottom 45%) -->
-<rect x="0" y="${H * 0.35}" width="${W}" height="${H * 0.65}" fill="url(#botFade)"/>
+<!-- Top fade — covers logo zone -->
+<rect x="0" y="0"           width="${W}" height="${H * 0.42}" fill="url(#topFade)"/>
+<!-- Bottom fade — covers tagline zone -->
+<rect x="0" y="${H * 0.55}" width="${W}" height="${H * 0.45}" fill="url(#botFade)"/>
 
 <!-- Dot + scanline textures -->
 <rect x="0" y="0" width="${W}" height="${H}" fill="url(#dots)"/>
