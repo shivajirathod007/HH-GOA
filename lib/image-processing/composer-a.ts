@@ -2,6 +2,7 @@ import { fonts } from "./fonts";
 import sharp from 'sharp';
 import path from 'path';
 import { processUserPhoto, CropData } from './image-utils';
+import { renderTextToPaths } from './text-renderer';
 
 export const runtime = 'nodejs';
 
@@ -27,16 +28,11 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
   const LOGO_TOP  = H - LOGO_H - BORDER - 30;
   const LOGO_LEFT = Math.round((W - LOGO_W) / 2);
 
+  // Generate text paths (completely bypassing system fonts)
+  const textFrameInGoa = renderTextToPaths('#FrameInGoa', 'JetBrains', 28, cx, BORDER + 48, '#E91E8C', 'center', 4);
+  const textTagline = renderTextToPaths('BUILD · BREAK · BOND', 'Inter', 20, cx, BORDER + 88, 'rgba(255,255,255,0.38)', 'center', 9);
+
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-<style>
-  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 700; font-style: normal; }
-  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 900; font-style: normal; }
-  @font-face { font-family: 'Inter'; src: url('${fonts.Inter}'); font-weight: 700; font-style: normal; }
-  @font-face { font-family: 'Inter'; src: url('${fonts.InterRegular}'); font-weight: 500; font-style: normal; }
-  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 500; font-style: normal; }
-  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 600; font-style: normal; }
-  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 700; font-style: normal; }
-</style>
 <defs>
   <!-- Top fade — for top text -->
   <linearGradient id="topFade" x1="0" y1="0" x2="0" y2="1">
@@ -122,25 +118,12 @@ export async function composeFormatA(photoBuffer: Buffer, cropData: CropData): P
 <rect x="0"          y="${H*0.45}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.35)"/>
 <rect x="${W-BORDER}" y="${H*0.45}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.35)"/>
 
-<!-- ── TOP SECTION ── -->
-<!-- #FrameInGoa -->
-<text x="${cx}" y="${BORDER + 48}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700" font-size="28"
-  fill="#E91E8C" text-anchor="middle" letter-spacing="4">
-  #FrameInGoa
-</text>
-
-<!-- BUILD · BREAK · BOND  -->
-<text x="${cx}" y="${BORDER + 88}"
-  font-family="'Inter',sans-serif" font-weight="700" font-size="20"
-  fill="rgba(255,255,255,0.38)" text-anchor="middle" letter-spacing="9">
-  BUILD · BREAK · BOND
-</text>
+<!-- ── TOP SECTION TEXT PATHS ── -->
+${textFrameInGoa}
+${textTagline}
 
 <!-- Separator line -->
 <rect x="160" y="${BORDER + 116}" width="${W - 320}" height="1.5" rx="1" fill="url(#sepG)"/>
-
-<!-- ── BOTTOM LOGO ZONE (handled by sharp composite) ── -->
 </svg>`;
 
   return sharp(processedPhoto)

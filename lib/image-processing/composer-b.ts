@@ -2,6 +2,7 @@ import { fonts } from "./fonts";
 import sharp from 'sharp';
 import path from 'path';
 import { processUserPhoto, CropData } from './image-utils';
+import { renderTextToPaths } from './text-renderer';
 
 export const runtime = 'nodejs';
 
@@ -98,17 +99,28 @@ export async function composeFormatB(
     .toBuffer();
 
 
+  // Generate text paths (completely bypassing system fonts)
+  const spineText = renderTextToPaths('HACK THE 300', 'Inter', 16, 30, H / 2, 'rgba(255,255,255,0.1)', 'center', 5);
+  // Slogan
+  const slogan1 = renderTextToPaths('Your Build.', 'Playfair', 34, cx - 74, SLOGAN_ABOVE_Y, '#FFD700', 'right', 0.5);
+  const slogan2 = renderTextToPaths(' Your Goa.', 'Playfair', 34, cx - 74, SLOGAN_ABOVE_Y, 'rgba(255,255,255,0.5)', 'left', 0.5);
+  // Name & Stack
+  const nameText = renderTextToPaths(safeName, 'Playfair', nameFontSize, cx, NAME_Y, 'url(#nameG)', 'center', 1);
+  const stackText = renderTextToPaths(safeStack, 'JetBrains', 28, cx, STACK_Y, '#A89EC4', 'center', 2);
+  const titleText = renderTextToPaths(safeTitle, 'Inter', 29, cx, BADGE_TOP + BADGE_H * 0.67, '#FFD700', 'center', 0);
+  // ID
+  const idLabel = renderTextToPaths('ID:', 'JetBrains', 28, 110, ID_Y, '#E91E8C', 'left', 1);
+  const idValue = renderTextToPaths('HHG26-2026', 'JetBrains', 28, 188, ID_Y, '#FFD700', 'left', 1);
+  // Meta
+  const dateText = renderTextToPaths('28 – 31 OCT 2026', 'InterRegular', 27, 158, DATE_Y, 'rgba(255,255,255,0.8)', 'left', 0);
+  const locText = renderTextToPaths('GOA, INDIA', 'InterRegular', 27, 158, LOC_Y, 'rgba(255,255,255,0.8)', 'left', 0);
+  // Footer
+  const footLeft = renderTextToPaths('GOA, INDIA  ·  28 – 31 OCT 2026', 'JetBrains', 18, 60, FOOT_Y, 'rgba(255,255,255,0.25)', 'left', 2);
+  const footRight = renderTextToPaths('VOXEL STUDIO', 'JetBrains', 18, W - 60, FOOT_Y, 'rgba(255,255,255,0.25)', 'right', 2);
+  const hashtag = renderTextToPaths('#FrameInGoa', 'JetBrains', 24, cx, HASH_Y, '#E91E8C', 'center', 3);
+
 // ── SVG overlay ─────────────────────────────────────────────────
   const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-<style>
-  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 700; font-style: normal; }
-  @font-face { font-family: 'Playfair Display'; src: url('${fonts.Playfair}'); font-weight: 900; font-style: normal; }
-  @font-face { font-family: 'Inter'; src: url('${fonts.Inter}'); font-weight: 700; font-style: normal; }
-  @font-face { font-family: 'Inter'; src: url('${fonts.InterRegular}'); font-weight: 500; font-style: normal; }
-  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 500; font-style: normal; }
-  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 600; font-style: normal; }
-  @font-face { font-family: 'JetBrains Mono'; src: url('${fonts.JetBrains}'); font-weight: 700; font-style: normal; }
-</style>
 <defs>
   <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0%"   stop-color="#110621"/>
@@ -189,20 +201,18 @@ export async function composeFormatB(
 <rect x="0"           y="${H * 0.6}"  width="${BORDER}" height="3" fill="rgba(255,255,255,0.3)"/>
 <rect x="${W - BORDER}" y="${H * 0.33}" width="${BORDER}" height="3" fill="rgba(255,255,255,0.3)"/>
 <rect x="${W - BORDER}" y="${H * 0.6}"  width="${BORDER}" height="3" fill="rgba(255,255,255,0.3)"/>
-<!-- Spine text -->
-<text x="30" y="${H / 2}" font-family="'Inter',sans-serif" font-weight="700" font-size="16"
-  fill="rgba(255,255,255,0.1)" text-anchor="middle" letter-spacing="5"
-  transform="rotate(-90, 30, ${H / 2})">HACK THE 300</text>
+
+<!-- Spine text (rotated) -->
+<g transform="rotate(-90, 30, ${H / 2})">
+  ${spineText}
+</g>
 
 <!-- Logo zone fade -->
 <rect x="0" y="0" width="${W}" height="${LOGO_TOP + LOGO_H + 40}" fill="url(#logoBg)"/>
 
 <!-- SLOGAN — above the photo -->
-<text x="${cx}" y="${SLOGAN_ABOVE_Y}"
-  font-family="'Playfair Display','Georgia',serif" font-weight="700"
-  font-size="34" text-anchor="middle" letter-spacing="0.5">
-  <tspan fill="#FFD700">Your Build.</tspan><tspan fill="rgba(255,255,255,0.5)"> Your Goa.</tspan>
-</text>
+${slogan1}
+${slogan2}
 
 <!-- Photo glow -->
 <rect x="${PHOTO_LEFT - 14}" y="${PHOTO_TOP - 14}"
@@ -216,38 +226,24 @@ export async function composeFormatB(
   fill="none" stroke="rgba(233,30,140,0.2)" stroke-width="2"/>
 
 <!-- NAME -->
-<text x="${cx}" y="${NAME_Y}"
-  font-family="'Playfair Display','Georgia',serif" font-weight="900"
-  font-size="${nameFontSize}" fill="url(#nameG)" text-anchor="middle" letter-spacing="1">
-  ${safeName}
-</text>
+${nameText}
 <!-- Name underline -->
 <rect x="${cx - 160}" y="${NAME_Y + 12}" width="320" height="3" rx="1.5" fill="url(#sepG)"/>
 
 <!-- STACK -->
-<text x="${cx}" y="${STACK_Y}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="500"
-  font-size="28" fill="#A89EC4" text-anchor="middle" letter-spacing="2">
-  ${safeStack}
-</text>
+${stackText}
 
 <!-- TITLE BADGE -->
 <rect x="${badgeX}" y="${BADGE_TOP}" width="${badgeW}" height="${BADGE_H}" rx="${BADGE_H / 2}"
   fill="rgba(255,215,0,0.07)" stroke="#FFD700" stroke-width="2"/>
-<text x="${cx}" y="${BADGE_TOP + BADGE_H * 0.67}"
-  font-family="'Inter',sans-serif" font-weight="700" font-size="29"
-  fill="#FFD700" text-anchor="middle">${safeTitle}</text>
+${titleText}
 
 <!-- DIVIDER 1 -->
 <rect x="90" y="${DIV1_Y}" width="${W - 180}" height="1.5" rx="1" fill="url(#sepG)"/>
 
 <!-- ID -->
-<text x="110" y="${ID_Y}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700"
-  font-size="28" fill="#E91E8C" letter-spacing="1">ID:</text>
-<text x="188" y="${ID_Y}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="600"
-  font-size="28" fill="#FFD700" letter-spacing="1">HHG26-2026</text>
+${idLabel}
+${idValue}
 
 <!-- DATE row -->
 <rect x="110" y="${DATE_Y - 28}" width="28" height="28" rx="5"
@@ -258,9 +254,7 @@ export async function composeFormatB(
   stroke="rgba(255,255,255,0.4)" stroke-width="1.8"/>
 <line x1="112" y1="${DATE_Y - 17}" x2="136" y2="${DATE_Y - 17}"
   stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-<text x="158" y="${DATE_Y}"
-  font-family="'Inter',sans-serif" font-weight="500" font-size="27"
-  fill="rgba(255,255,255,0.8)">28 – 31 OCT 2026</text>
+${dateText}
 
 <!-- LOCATION row -->
 <circle cx="124" cy="${LOC_Y - 14}" r="9"
@@ -268,9 +262,7 @@ export async function composeFormatB(
 <circle cx="124" cy="${LOC_Y - 14}" r="3.5" fill="rgba(255,255,255,0.3)"/>
 <line x1="124" y1="${LOC_Y - 5}" x2="124" y2="${LOC_Y}"
   stroke="rgba(255,255,255,0.2)" stroke-width="1.8"/>
-<text x="158" y="${LOC_Y}"
-  font-family="'Inter',sans-serif" font-weight="500" font-size="27"
-  fill="rgba(255,255,255,0.8)">GOA, INDIA</text>
+${locText}
 
 <!-- DIVIDER 2 -->
 <rect x="90" y="${DIV2_Y}" width="${W - 180}" height="1.5" rx="1" fill="url(#sepG)"/>
@@ -311,15 +303,9 @@ export async function composeFormatB(
 
 <!-- FOOTER -->
 <rect x="0" y="${H - 130}" width="${W}" height="130" fill="url(#footBg)"/>
-<text x="60" y="${FOOT_Y}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="500" font-size="18"
-  fill="rgba(255,255,255,0.25)" letter-spacing="2">GOA, INDIA  ·  28 – 31 OCT 2026</text>
-<text x="${W - 60}" y="${FOOT_Y}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700" font-size="18"
-  fill="rgba(255,255,255,0.25)" text-anchor="end" letter-spacing="2">VOXEL STUDIO</text>
-<text x="${cx}" y="${HASH_Y}"
-  font-family="'JetBrains Mono','Fira Code',monospace" font-weight="700" font-size="24"
-  fill="#E91E8C" text-anchor="middle" letter-spacing="3">#FrameInGoa</text>
+${footLeft}
+${footRight}
+${hashtag}
 </svg>`;
 
   const canvas = sharp({
