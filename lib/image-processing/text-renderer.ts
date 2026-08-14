@@ -31,7 +31,7 @@ export function renderTextToPaths(
 ): string {
   if (!text) return '';
   const font = parsedFonts[fontName];
-  const chars = text.split('');
+  const chars = Array.from(text);
   let totalWidth = 0;
   
   // Measure exact width
@@ -47,10 +47,12 @@ export function renderTextToPaths(
   let paths = '';
   chars.forEach(c => {
      // Skip spaces as they don't produce paths
-     if (c !== ' ') {
+     if (c !== ' ' && c.trim() !== '') {
          const path = font.getPath(c, currentX, y, fontSize);
-         path.fill = color;
-         paths += path.toSVG(2) + '\n';
+         const pathData = path.toPathData(2);
+         if (pathData) {
+            paths += `<path d="${pathData}" fill="${color}" />\n`;
+         }
      }
      currentX += font.getAdvanceWidth(c, fontSize) + letterSpacing;
   });
